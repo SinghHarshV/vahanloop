@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { bookingCreateSchema } from '@/lib/validations';
+import { calculateBookingPrice } from '@/lib/pricing';
+import { checkAndExpireReservations } from '@/lib/bookingExpiry';
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,6 +11,9 @@ export async function GET(req: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
+
+    // Trigger proactive expiry evaluation
+    await checkAndExpireReservations();
 
     const { searchParams } = new URL(req.url);
     const roleParam = searchParams.get('role'); // e.g., 'owner' or 'customer'
@@ -43,12 +48,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
+    // Proactively clean up any expired reservations to immediately free vehicles
+    await checkAndExpireReservations();
+
     const body = await req.json();
     const parsed = bookingCreateSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { error: 'Invalid booking data', details: parsed.error.format() },
         { status: 400 }
       );
     }
@@ -59,59 +67,74 @@ export async function POST(req: NextRequest) {
     const start = new Date(pickupDateTime);
     const end = new Date(returnDateTime);
 
-    if (start >= end) {
+    if (start.getTime() >= end.getTime()) {
       return NextResponse.json(
-        { error: 'Return date and time must be after pickup date and time' },
+        { error: 'Invalid dates: Return time must be after pickup time' },
         { status: 400 }
       );
     }
 
-    // Server-side calculation of duration
-    const diffMs = end.getTime() - start.getTime();
-    const totalDays = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    // Prevent bookings in the deep past
+    if (end.getTime() < Date.now() - 3600000) {
+      return NextResponse.json(
+        { error: 'Invalid dates: Pickup and return cannot be in the past' },
+        { status: 400 }
+      );
+    }
 
-    // Fetch vehicle
-    const vehicle = await db.vehicle.findUnique({ where: { id: vehicleId } });
+    // Find vehicle
+    const vehicle = await db.vehicle.findUnique({
+      where: { id: vehicleId },
+    });
+
     if (!vehicle) {
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
 
-    if (vehicle.approvalStatus !== 'APPROVED' || vehicle.availabilityStatus !== 'AVAILABLE') {
+    if (vehicle.availabilityStatus !== 'AVAILABLE') {
       return NextResponse.json(
-        { error: 'Vehicle is not currently available for public booking' },
+        { error: 'This vehicle is currently not available for bookings' },
         { status: 400 }
       );
     }
 
-    // Validate mode support
+    // Prevent hosts from renting their own vehicles
+    if (vehicle.ownerId === session.userId) {
+      return NextResponse.json(
+        { error: 'Partners cannot book their own registered vehicles' },
+        { status: 400 }
+      );
+    }
+
+    // Check rental mode capability
     if (rentalType === 'CHAUFFEUR' && !vehicle.chauffeurEnabled) {
       return NextResponse.json(
-        { error: 'Chauffeur rental is not offered for this vehicle' },
+        { error: 'Chauffeur rental mode is not supported for this vehicle' },
         { status: 400 }
       );
     }
-
     if (rentalType === 'SELF_DRIVE' && !vehicle.selfDriveEnabled) {
       return NextResponse.json(
-        { error: 'Self-drive rental is not offered for this vehicle' },
+        { error: 'Self-drive rental mode is not supported for this vehicle' },
         { status: 400 }
       );
     }
 
-    // Server-side price calculation
-    const basePrice = Math.round(vehicle.dailyRentalPrice * totalDays);
-    const dailyDriverCharge =
-      rentalType === 'CHAUFFEUR' ? vehicle.driverCharge || 700 : 0;
-    const driverCharge = Math.round(dailyDriverCharge * totalDays);
-    const subtotal = basePrice + driverCharge;
-    const serviceFee = Math.round(subtotal * 0.1); // 10%
+    // Pure centralized server-side price calculation (never trusting browser)
+    const priceQuote = calculateBookingPrice({
+      category: vehicle.category as any,
+      dailyRate: vehicle.dailyRentalPrice,
+      startDate: start,
+      endDate: end,
+      rentalType: rentalType as any,
+      driverChargePerDay: vehicle.driverCharge || 700,
+    });
 
-    // Security deposit by category
-    let securityDeposit = 2000;
-    if (vehicle.category === 'BIKE') securityDeposit = 1500;
-    if (vehicle.category === 'SCOOTER') securityDeposit = 1000;
-
-    const totalAmount = subtotal + serviceFee + securityDeposit;
+    const basePrice = priceQuote.baseRentalPricePaise / 100;
+    const driverCharge = priceQuote.chauffeurFeePaise / 100;
+    const serviceFee = priceQuote.serviceFeePaise / 100;
+    const securityDeposit = priceQuote.securityDepositPaise / 100;
+    const totalAmount = priceQuote.totalPayablePaise / 100;
 
     // Transaction & Date Collision Check
     const result = await db.$transaction(async (tx: any) => {
@@ -120,24 +143,25 @@ export async function POST(req: NextRequest) {
         where: { vehicleId: vehicle.id },
       });
 
-      const activeStatuses = ['ACCEPTED', 'AWAITING_PAYMENT', 'CONFIRMED', 'ACTIVE'];
+      const activeHoldingStatuses = ['ACCEPTED', 'AWAITING_PAYMENT', 'CONFIRMED', 'ACTIVE'];
 
+      // Half-open interval conflict check: [start, end)
       const hasConflict = existingBookings.some((b: any) => {
-        if (!activeStatuses.includes(b.status)) return false;
+        if (!activeHoldingStatuses.includes(b.status)) return false;
         const bStart = new Date(b.pickupDateTime).getTime();
         const bEnd = new Date(b.returnDateTime).getTime();
         const reqStart = start.getTime();
         const reqEnd = end.getTime();
 
-        // Date overlap formula
-        return reqStart <= bEnd && reqEnd >= bStart;
+        // Half-open interval: overlapping if reqStart < bEnd && reqEnd > bStart
+        return reqStart < bEnd && reqEnd > bStart;
       });
 
       if (hasConflict) {
         return {
           conflict: true,
           error:
-            'This vehicle has an accepted or confirmed reservation for the requested dates. Please choose another date range.',
+            'This vehicle has an accepted or confirmed reservation holding the requested dates. Please choose another date range.',
         };
       }
 
@@ -159,11 +183,57 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // Save immutable price snapshot
+      if (tx.bookingPriceSnapshot?.create) {
+        await tx.bookingPriceSnapshot.create({
+          data: {
+            bookingId: booking.id,
+            currency: 'INR',
+            baseRentalPricePaise: priceQuote.baseRentalPricePaise,
+            durationDays: priceQuote.durationDays,
+            dailyRatePaise: priceQuote.dailyRatePaise,
+            chauffeurFeePaise: priceQuote.chauffeurFeePaise,
+            extraKmChargePaise: priceQuote.extraKmChargePaise,
+            serviceFeePaise: priceQuote.serviceFeePaise,
+            estimatedTaxPaise: priceQuote.estimatedTaxPaise,
+            securityDepositPaise: priceQuote.securityDepositPaise,
+            totalPayablePaise: priceQuote.totalPayablePaise,
+            formattedInr: priceQuote.formatted.totalPayable,
+          },
+        });
+      }
+
+      // Record initial history
+      if (tx.bookingStatusHistory?.create) {
+        await tx.bookingStatusHistory.create({
+          data: {
+            bookingId: booking.id,
+            previousStatus: null,
+            newStatus: 'REQUESTED',
+            changedBy: session.userId,
+            note: 'Customer submitted rental request',
+          },
+        });
+      }
+
       return { conflict: false, booking };
     });
 
     if (result.conflict) {
       return NextResponse.json({ error: result.error }, { status: 409 });
+    }
+
+    // Create owner notification
+    if (db.notification?.create) {
+      await db.notification.create({
+        data: {
+          userId: vehicle.ownerId,
+          title: 'New Booking Request',
+          message: `Guest ${session.fullName || session.email} requested a rental for ${vehicle.make} ${vehicle.model}.`,
+          type: 'INFO',
+          link: '/owner/requests',
+        },
+      });
     }
 
     await db.auditLog.create({
@@ -172,12 +242,12 @@ export async function POST(req: NextRequest) {
         action: 'BOOKING_REQUESTED',
         entityType: 'BOOKING',
         entityId: result.booking.id,
-        details: `Requested booking for ${vehicle.make} ${vehicle.model} by ${session.email}`,
+        details: `Requested booking for ${vehicle.make} ${vehicle.model} by ${session.email}. Total: ₹${totalAmount}`,
       },
     });
 
     return NextResponse.json(
-      { message: 'Booking request sent successfully to host', booking: result.booking },
+      { message: 'Booking request sent successfully to host', booking: result.booking, priceQuote },
       { status: 201 }
     );
   } catch (error: any) {

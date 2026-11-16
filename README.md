@@ -1,25 +1,30 @@
 # VahanLoop – Peer-to-Peer Vehicle Rental Marketplace
-**Version 0.2.0 – Phase 2: Database-Backed Architecture & Authentication**  
+**Version 0.3.0 – Phase 3: Production-Oriented Booking Engine, Payment Integration & Secure Document Management**  
 *Tagline: "Your vehicle. Your earnings. Your journey."*
 
 ---
 
 ## 1. Project Overview
-**VahanLoop** is a modern, trust-first peer-to-peer mobility marketplace connecting individual and commercial vehicle partners who have underutilised cars, motorcycles, or scooters with customers seeking short-term rentals (self-drive or with a verified chauffeur).
+**VahanLoop** is an Indian mobility marketplace connecting private & commercial fleet owners who have underutilized cars, motorcycles, or scooters with verified customers seeking short-term rentals (self-drive or with a verified chauffeur).
 
-In **Phase 2**, the prototype has been upgraded from a client-side localStorage prototype into a full **database-driven, API-backed full-stack web application** with PostgreSQL, Prisma ORM, JWT session authentication, server-side Role-Based Access Control (RBAC), and server-side pricing & conflict validation.
+In **Phase 3**, the system has been strengthened with:
+1. **A Reliable Booking Engine**: Full lifecycle tracking (`REQUESTED` → `ACCEPTED` / `AWAITING_PAYMENT` → `CONFIRMED` → `ACTIVE` → `COMPLETED` / `EXPIRED`), a centralized pricing engine calculating in integer paise with zero floating-point error, and half-open time interval double-booking prevention.
+2. **Reservation Expiry Engine**: Automatic 15-minute reservation hold release when payment is not completed in time.
+3. **Payment Gateway Abstraction**: Pluggable `MockPaymentProvider` and `RazorpayTestProvider` with server-side signature validation, idempotent webhook event deduplication, and immutable refund logging.
+4. **Secure Vehicle Document Management**: Isolated private storage (outside public folders), OWASP-compliant magic byte and extension allowlist verification, signed temporary URLs, and complete audit logging.
+5. **Vehicle Eligibility Engine**: Multi-point automated compliance checklist (RC, Insurance, PUC, Owner verification) preventing unverified vehicles from being published.
+6. **Handover & Return Inspections**: Verifiable odometer, fuel percentage, and condition check records before and after rentals.
 
 ---
 
 ## 2. Technology Stack
 - **Frontend Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS with custom mobility startup design system (Deep Slate Navy, Emerald accents, light background)
-- **Database & ORM**: PostgreSQL with Prisma ORM
+- **Styling**: Tailwind CSS
+- **Database & ORM**: PostgreSQL with Prisma ORM (v5.22.0)
+- **Payment Providers**: Razorpay SDK (Test Mode) & MockPaymentProvider
 - **Authentication**: Stateless HTTP-only JWT cookies (`jose`), password hashing via `bcryptjs`
-- **Validation**: Zod schemas for all API payloads and queries
-- **Dual-Mode Database Layer**: Auto-detects PostgreSQL with Prisma; transparently falls back to an in-memory relational store when running without Docker/PostgreSQL so the app works out of the box anywhere.
-- **Icons**: Lucide React
+- **Validation**: Zod schemas & binary magic-byte stream validation
 
 ---
 
@@ -30,9 +35,9 @@ All demo accounts share the development demonstration password:
 
 | Role | Email | Capabilities |
 | :--- | :--- | :--- |
-| **Customer** | `customer@vahanloop.demo` | Search vehicles, request rentals, track bookings, simulate payment checkout |
-| **Owner** | `owner@vahanloop.demo` | Register vehicles (pending review), manage fleet status, accept/decline rental requests, track simulated earnings |
-| **Admin** | `admin@vahanloop.demo` | Review & approve/reject host vehicle submissions, platform audit metrics, supervise all bookings |
+| **Customer** | `customer@vahanloop.demo` | Search vehicles, request rentals, track bookings, test checkout & payment |
+| **Owner** | `owner@vahanloop.demo` | Register fleet, accept/decline rental requests (with 15m hold), upload compliance documents, submit vehicle inspections |
+| **Admin** | `admin@vahanloop.demo` | Supervise reservations, verify compliance documents, inspect transactions, issue test refunds, platform audits |
 
 ---
 
@@ -40,7 +45,6 @@ All demo accounts share the development demonstration password:
 
 ### Prerequisites
 - Node.js 18+ or 20+
-- Optional: Docker and Docker Compose (for local PostgreSQL container)
 
 ### Setup & Run
 
@@ -54,74 +58,54 @@ All demo accounts share the development demonstration password:
    cp .env.example .env
    ```
 
-3. **Database Options**:
-   - **Option A (With Docker & PostgreSQL)**:
-     ```bash
-     docker compose up -d
-     npx prisma migrate dev --name init
-     node scripts/seed.mjs
-     ```
-   - **Option B (Zero-Config / Without Docker)**:
-     The application includes a dual-mode database client. If PostgreSQL is not running, it automatically switches to an in-memory relational store pre-seeded with all 3 demo roles, 9 vehicles, and sample bookings.
+3. **Run Automated Unit Tests**:
+   ```bash
+   node scripts/test-phase3.mjs
+   ```
 
-4. **Run Development Server**:
+4. **Run Next.js Production Build**:
+   ```bash
+   npm run build
+   ```
+
+5. **Start Development Server**:
    ```bash
    npm run dev
    ```
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-5. **Run Automated API Test Suite**:
-   ```bash
-   node scripts/test-api.mjs
-   ```
+---
+
+## 5. Phase 3 API Reference
+
+### Booking & Availability
+- `POST /api/bookings` – Submit rental request with server-side pricing and half-open collision validation
+- `POST /api/bookings/[id]/accept` – Host accepts request; sets 15-minute temporary reservation hold (`AWAITING_PAYMENT`)
+- `POST /api/bookings/[id]/reject` – Host declines request with reason
+- `POST /api/bookings/[id]/cancel` – Customer or host cancels booking
+- `POST /api/pricing/quote` – Centralized immutable pricing quote in integer paise
+
+### Payment Gateway (Test Mode)
+- `POST /api/bookings/[id]/create-payment-order` – Generates provider payment order
+- `POST /api/bookings/[id]/verify-payment` – Verifies cryptographic signature before setting booking to `CONFIRMED`
+- `POST /api/payments/webhook` – Idempotent Razorpay test webhook listener with HMAC signature verification
+- `GET /api/admin/refunds` – List refund transactions
+- `POST /api/admin/refunds` – Issue test refund without altering original payment records
+
+### Secure Document Management
+- `POST /api/documents/upload` – Upload vehicle documents to private storage (OWASP magic-byte verified)
+- `GET /api/documents/download/[fileKey]` – Secure download with short-lived HMAC-signed URLs and access checks
+- `POST /api/documents/[id]/review` – Administrative document approval/rejection with mandatory audit logging
+
+### Eligibility & Inspections
+- `GET /api/vehicles/[id]/eligibility` – Multi-point vehicle publication compliance check
+- `GET /api/inspections?bookingId=...` – Fetch handover & return inspection records
+- `POST /api/inspections` – Record odometer, fuel level, and condition before/after trips
+- `GET /api/notifications` – Fetch in-app user notifications
 
 ---
 
-## 5. API Reference
-
-### Authentication
-- `POST /api/auth/register` – Register customer or owner account (auto password hashing, duplicate check)
-- `POST /api/auth/login` – Authenticate with email & password, sets HTTP-only `vahanloop_session` JWT cookie
-- `POST /api/auth/logout` – Clear session cookie
-- `GET /api/auth/me` – Current authenticated user session & permitted roles
-
-### Vehicles
-- `GET /api/vehicles` – Public search with query parameters (`category`, `location`, `rentalType`, `fuelType`, `transmission`, `maxPrice`, `q`)
-- `POST /api/vehicles` – Create new vehicle listing (owner only, status: `PENDING`)
-- `GET /api/vehicles/[id]` – Vehicle details (unapproved hidden from unauthorized users)
-- `PATCH /api/vehicles/[id]` – Update vehicle or toggle availability (`AVAILABLE` / `INACTIVE`)
-- `DELETE /api/vehicles/[id]` – Delete/deactivate vehicle
-
-### Admin Management
-- `GET /api/admin/dashboard` – High-level KPI metrics and recent audit events
-- `GET /api/admin/users` – User accounts ledger (passwords excluded)
-- `GET /api/admin/vehicles` – All vehicles across all statuses
-- `POST /api/admin/vehicles/[id]/approve` – Approve listing and publish to search
-- `POST /api/admin/vehicles/[id]/reject` – Reject listing with reason
-- `GET /api/admin/bookings` – All marketplace bookings
-- `GET /api/admin/transactions` – All platform payment records
-- `POST /api/admin/reset` – Factory restore demo store to seed data
-
-### Bookings & Lifecycle
-- `POST /api/bookings` – Submit reservation (server-side pricing, overlap detection transaction)
-- `GET /api/bookings` – Fetch bookings (filtered by role)
-- `GET /api/bookings/[id]` – Booking details with access control
-- `POST /api/bookings/[id]/accept` – Host accepts reservation (`AWAITING_PAYMENT`)
-- `POST /api/bookings/[id]/reject` – Host declines reservation with reason
-- `POST /api/bookings/[id]/cancel` – Customer or Admin cancels booking
-- `POST /api/bookings/[id]/simulate-payment` – Customer completes payment (`CONFIRMED`, generates `TXN-VL-...`)
-
-### Owner Portal
-- `GET /api/owner/dashboard` – Fleet overview metrics & pending requests
-- `GET /api/owner/vehicles` – Owner's registered vehicles
-- `GET /api/owner/bookings` – Rental requests for owner's fleet
-- `GET /api/owner/earnings` – Payout breakdown & settlements ledger
-
----
-
-## 6. Architecture & Security Highlights
-- **Strict Server-Side Pricing**: Total amount, platform commission (10%), and security deposits (Car: ₹2,000, Bike: ₹1,500, Scooter: ₹1,000) are computed exclusively on the server.
-- **Date Overlap Detection**: Enforced inside atomic transactions to prevent double-booking of vehicles.
-- **HTTP-Only Cookies**: JWT tokens are transmitted via `httpOnly`, `sameSite: lax` cookies preventing XSS token theft.
-- **Role-Based Protection**: Non-administrators cannot access admin endpoints or approve listings; owners can only manage their own vehicles and requests.
-- **Graceful Fallback**: Transparent dual-mode DB client allows seamless development whether PostgreSQL is connected or not.
+## 6. Financial & Security Restriction Notice
+- **All financial transactions operate strictly in test mode.**
+- Live credit cards, real bank transfers, and live Razorpay keys (`rzp_live_...`) are rejected by runtime safety checks.
+- Confidential vehicle documents are stored in an isolated private directory outside the public web root.
