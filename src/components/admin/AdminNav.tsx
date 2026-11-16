@@ -31,6 +31,11 @@ export const AdminNav: React.FC = () => {
       exact: true,
     },
     {
+      href: '/admin/operations',
+      label: 'Operations & Compliance Hub',
+      icon: <ShieldCheck className="w-4 h-4 text-brand-emerald" />,
+    },
+    {
       href: '/admin/vehicles',
       label: 'Vehicle Approvals',
       icon: <CheckSquare className="w-4 h-4" />,

@@ -504,8 +504,436 @@ export function getInitialSeedData() {
       action: 'SYSTEM_INITIALIZATION',
       entityType: 'PLATFORM',
       entityId: 'ROOT',
-      details: 'Platform initialized with Phase 2 relational schema',
+      details: 'Platform initialized with Phase 5 relational schema',
       createdAt: new Date(),
+    },
+  ];
+
+  const organisations = [
+    {
+      id: 'org-fleet-01',
+      businessName: 'Apex Mobility Fleet Services LLP',
+      businessType: 'LLP',
+      registeredAddress: '12th Floor, World Trade Centre, Malleshwaram, Bengaluru, Karnataka 560055',
+      panNumber: 'AABCA1234F',
+      gstin: '29AABCA1234F1Z5',
+      contactPerson: 'Vikramaditya Verma',
+      contactEmail: 'fleet@apexmobility.in',
+      contactPhone: '+919123456789',
+      verificationStatus: 'VERIFIED',
+      rejectionReason: null,
+      createdAt: new Date('2024-01-01T10:00:00Z'),
+      updatedAt: new Date('2024-01-01T10:00:00Z'),
+    },
+  ];
+
+  const fleetMembers = [
+    {
+      id: 'fm-01',
+      orgId: 'org-fleet-01',
+      userId: 'usr-owner-1',
+      role: 'OWNER',
+      permissions: 'MANAGE_ALL,ASSIGN_DRIVERS,VIEW_FINANCIALS',
+      createdAt: new Date('2024-01-01T10:00:00Z'),
+    },
+  ];
+
+  const fleetLocations = [
+    {
+      id: 'loc-blr-01',
+      orgId: 'org-fleet-01',
+      name: 'Indiranagar Central Hub',
+      address: '100ft Road, HAL 2nd Stage, Indiranagar',
+      city: 'Bengaluru',
+      postalCode: '560038',
+      latitude: 12.9784,
+      longitude: 77.6408,
+      contactPerson: 'Karan Singh',
+      contactNumber: '+919845011223',
+      operatingHours: '06:00 - 23:00',
+      pickupInstructions: 'Report to Bay 3. Key handover counter at customer lounge.',
+      isActive: true,
+      createdAt: new Date('2024-01-05T10:00:00Z'),
+    },
+    {
+      id: 'loc-blr-02',
+      orgId: 'org-fleet-01',
+      name: 'Kempegowda Airport Depot (BLR)',
+      address: 'Terminal 1 Dedicated Hub, Devanahalli',
+      city: 'Bengaluru',
+      postalCode: '560300',
+      latitude: 13.1986,
+      longitude: 77.7066,
+      contactPerson: 'Arun Nair',
+      contactNumber: '+919845099887',
+      operatingHours: '24 Hours',
+      pickupInstructions: 'Pick-up from Zone B Pillar 14 after baggage carousel.',
+      isActive: true,
+      createdAt: new Date('2024-01-10T10:00:00Z'),
+    },
+  ];
+
+  const fleetAssignments = [
+    {
+      id: 'fa-01',
+      vehicleId: 'veh-car-01',
+      orgId: 'org-fleet-01',
+      locationId: 'loc-blr-01',
+      assignedAt: new Date('2024-01-15T10:00:00Z'),
+    },
+    {
+      id: 'fa-02',
+      vehicleId: 'veh-car-02',
+      orgId: 'org-fleet-01',
+      locationId: 'loc-blr-01',
+      assignedAt: new Date('2024-01-15T10:00:00Z'),
+    },
+    {
+      id: 'fa-03',
+      vehicleId: 'veh-car-04',
+      orgId: 'org-fleet-01',
+      locationId: 'loc-blr-02',
+      assignedAt: new Date('2024-01-20T10:00:00Z'),
+    },
+  ];
+
+  const ownerVerifications = [
+    {
+      id: 'ov-01',
+      userId: 'usr-owner-1',
+      ownerType: 'INDIVIDUAL',
+      currentStep: 5,
+      status: 'VERIFIED',
+      fullName: 'Vikramaditya Verma',
+      email: 'owner@vahanloop.demo',
+      mobile: '+919123456789',
+      address: 'Flat 402, Prestige Palms, Indiranagar, Bengaluru 560038',
+      profilePhotoUrl: null,
+      idVerificationMethod: 'MANUAL_VOTER_ID',
+      idVerificationRef: 'SYN-DL-KA0320198811',
+      bankAccountHolder: 'Vikramaditya Verma',
+      bankVerificationStatus: 'VERIFIED',
+      bankVerificationRef: 'SYN-HDFC-991204',
+      payoutEligible: true,
+      termsAccepted: true,
+      termsVersion: 'v1.2',
+      termsAcceptedAt: new Date('2023-11-20T10:00:00Z'),
+      submittedAt: new Date('2023-11-20T10:00:00Z'),
+      reviewedBy: 'usr-admin-1',
+      reviewedAt: new Date('2023-11-21T11:00:00Z'),
+      rejectionReason: null,
+      createdAt: new Date('2023-11-20T10:00:00Z'),
+      updatedAt: new Date('2023-11-21T11:00:00Z'),
+    },
+  ];
+
+  const driverProfiles = [
+    {
+      id: 'drv-01',
+      userId: 'usr-driver-1',
+      fullName: 'Ramesh Kumar',
+      phone: '+919876501234',
+      email: 'ramesh.driver@vahanloop.demo',
+      address: 'Domlur Layout, Bengaluru, Karnataka',
+      licenceCategory: 'LMV-TR',
+      licenceNumber: 'KA-01-20150009988',
+      licenceVerificationStatus: 'VERIFIED',
+      backgroundScreeningStatus: 'VERIFIED',
+      employmentType: 'CONTRACTOR',
+      orgId: 'org-fleet-01',
+      availabilityStatus: 'AVAILABLE',
+      rating: 4.9,
+      totalTrips: 142,
+      rejectionReason: null,
+      createdAt: new Date('2024-01-01T10:00:00Z'),
+      updatedAt: new Date('2024-01-01T10:00:00Z'),
+    },
+    {
+      id: 'drv-02',
+      userId: 'usr-driver-2',
+      fullName: 'Manjunath Gowda',
+      phone: '+919876505678',
+      email: 'manjunath.driver@vahanloop.demo',
+      address: 'Koramangala, Bengaluru, Karnataka',
+      licenceCategory: 'LMV',
+      licenceNumber: 'KA-05-20180011223',
+      licenceVerificationStatus: 'VERIFIED',
+      backgroundScreeningStatus: 'VERIFIED',
+      employmentType: 'FULL_TIME',
+      orgId: 'org-fleet-01',
+      availabilityStatus: 'AVAILABLE',
+      rating: 4.8,
+      totalTrips: 87,
+      rejectionReason: null,
+      createdAt: new Date('2024-01-15T10:00:00Z'),
+      updatedAt: new Date('2024-01-15T10:00:00Z'),
+    },
+  ];
+
+  const driverAssignments = [
+    {
+      id: 'dta-01',
+      bookingId: 'bk-demo-103',
+      driverId: 'drv-01',
+      status: 'ASSIGNED',
+      tripStartTime: null,
+      tripEndTime: null,
+      startOdometer: null,
+      endOdometer: null,
+      notes: 'Customer requested luggage assistance at pickup',
+      rejectionReason: null,
+      createdAt: new Date('2024-04-03T11:30:00Z'),
+      updatedAt: new Date('2024-04-03T11:30:00Z'),
+    },
+  ];
+
+  const complianceRules = [
+    {
+      id: 'cr-ka-car-sd',
+      ruleId: 'RULE-KA-CAR-SELFDRIVE',
+      jurisdictionState: 'KARNATAKA',
+      jurisdictionCity: 'BENGALURU',
+      vehicleCategory: 'CAR',
+      rentalModel: 'SELF_DRIVE',
+      ownerCategory: 'INDIVIDUAL',
+      requiredDocuments: 'RC,INSURANCE,PUC',
+      requiredPermits: 'RENT_A_CAB',
+      status: 'ACTIVE',
+      effectiveDate: new Date('2024-01-01T00:00:00Z'),
+      expiryDate: null,
+      sourceReference: 'Motor Vehicles Act 1988, Section 75 / Rent a Cab Scheme 1989',
+      reviewerNotes: 'Mandatory commercial Yellow-on-Black registration or verified platform pilot permit.',
+      version: 1,
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: new Date('2024-01-01T00:00:00Z'),
+    },
+    {
+      id: 'cr-ka-car-ch',
+      ruleId: 'RULE-KA-CAR-CHAUFFEUR',
+      jurisdictionState: 'KARNATAKA',
+      jurisdictionCity: 'BENGALURU',
+      vehicleCategory: 'CAR',
+      rentalModel: 'CHAUFFEUR',
+      ownerCategory: 'BUSINESS',
+      requiredDocuments: 'RC,INSURANCE,PUC,COMMERCIAL_PERMIT',
+      requiredPermits: 'ALL_INDIA_TOURIST_PERMIT',
+      status: 'ACTIVE',
+      effectiveDate: new Date('2024-01-01T00:00:00Z'),
+      expiryDate: null,
+      sourceReference: 'Karnataka Motor Vehicles Rules 1989, Rule 115',
+      reviewerNotes: 'Requires LMV-TR driver badge and valid commercial insurance endorsement.',
+      version: 1,
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: new Date('2024-01-01T00:00:00Z'),
+    },
+    {
+      id: 'cr-ka-bike-sd',
+      ruleId: 'RULE-KA-BIKE-SELFDRIVE',
+      jurisdictionState: 'KARNATAKA',
+      jurisdictionCity: 'BENGALURU',
+      vehicleCategory: 'BIKE',
+      rentalModel: 'SELF_DRIVE',
+      ownerCategory: 'INDIVIDUAL',
+      requiredDocuments: 'RC,INSURANCE,PUC',
+      requiredPermits: 'RENT_A_MOTORCYCLE',
+      status: 'ACTIVE',
+      effectiveDate: new Date('2024-01-01T00:00:00Z'),
+      expiryDate: null,
+      sourceReference: 'Rent a Motorcycle Scheme 1997',
+      reviewerNotes: 'Valid fitness certificate and two ISI-certified helmets mandatory.',
+      version: 1,
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: new Date('2024-01-01T00:00:00Z'),
+    },
+    {
+      id: 'cr-mh-car-sd',
+      ruleId: 'RULE-MH-CAR-SELFDRIVE',
+      jurisdictionState: 'MAHARASHTRA',
+      jurisdictionCity: 'MUMBAI',
+      vehicleCategory: 'CAR',
+      rentalModel: 'SELF_DRIVE',
+      ownerCategory: 'BUSINESS',
+      requiredDocuments: 'RC,INSURANCE,PUC,COMMERCIAL_PERMIT',
+      requiredPermits: 'RENT_A_CAB',
+      status: 'ACTIVE',
+      effectiveDate: new Date('2024-01-01T00:00:00Z'),
+      expiryDate: null,
+      sourceReference: 'Maharashtra Motor Vehicles Department Notification 2021',
+      reviewerNotes: 'Speed governor verification and GPS telematics logging required.',
+      version: 1,
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+      updatedAt: new Date('2024-01-01T00:00:00Z'),
+    },
+  ];
+
+  const complianceVersions = [
+    {
+      id: 'crv-01',
+      ruleId: 'cr-ka-car-sd',
+      version: 1,
+      changeSummary: 'Initial policy baseline for Karnataka self-drive pilot',
+      changedBy: 'usr-admin-1',
+      snapshot: JSON.stringify(complianceRules[0]),
+      createdAt: new Date('2024-01-01T00:00:00Z'),
+    },
+  ];
+
+  const expiryNotifications = [
+    {
+      id: 'notif-exp-01',
+      entityType: 'VEHICLE',
+      entityId: 'veh-car-01',
+      documentType: 'PUC',
+      expiryDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // 12 days left
+      daysRemaining: 12,
+      threshold: 15,
+      notifiedAt: new Date(),
+      status: 'SENT',
+    },
+    {
+      id: 'notif-exp-02',
+      entityType: 'DRIVER',
+      entityId: 'drv-02',
+      documentType: 'DRIVING_LICENCE',
+      expiryDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000), // 6 days left
+      daysRemaining: 6,
+      threshold: 7,
+      notifiedAt: new Date(),
+      status: 'SENT',
+    },
+  ];
+
+  const handovers = [
+    {
+      id: 'ho-01',
+      bookingId: 'bk-demo-101',
+      completedAt: new Date('2024-04-10T09:15:00Z'),
+      verifiedBy: 'usr-owner-1',
+      odometerReading: 24500,
+      fuelLevelPercent: 100,
+      conditionRating: 'EXCELLENT',
+      notes: 'Clean handover. All 4 panels photographed. Spare tyre and tools verified.',
+      photosJson: JSON.stringify([
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800',
+      ]),
+      customerConfirmed: true,
+      handoverStatus: 'COMPLETED',
+    },
+  ];
+
+  const returnRecords = [
+    {
+      id: 'ret-01',
+      bookingId: 'bk-demo-101',
+      completedAt: new Date('2024-04-12T18:05:00Z'),
+      verifiedBy: 'usr-owner-1',
+      odometerReading: 24890,
+      fuelLevelPercent: 100,
+      conditionRating: 'EXCELLENT',
+      notes: 'Returned in pristine condition. Zero new scratches or dents.',
+      photosJson: JSON.stringify([
+        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800',
+      ]),
+      disputeRaised: false,
+      disputeNotes: null,
+      returnStatus: 'COMPLETED',
+    },
+  ];
+
+  const incidents = [
+    {
+      id: 'inc-01',
+      bookingId: 'bk-demo-101',
+      reportedBy: 'usr-customer-1',
+      reportedByRole: 'CUSTOMER',
+      vehicleId: 'veh-car-01',
+      driverId: null,
+      category: 'BREAKDOWN',
+      priority: 'MEDIUM',
+      status: 'RESOLVED',
+      title: 'Flat tyre on Outer Ring Road',
+      description: 'Rear left tyre suffered puncture near Marathahalli. Spare tyre fitted via roadside assistance.',
+      location: 'Outer Ring Road, Marathahalli, Bengaluru',
+      emergencyContactUsed: false,
+      assignedAgentId: 'usr-admin-1',
+      resolutionNotes: 'Roadside puncture technician dispatched within 25 minutes. Replacement tyre fitted smoothly.',
+      createdAt: new Date('2024-04-11T14:20:00Z'),
+      updatedAt: new Date('2024-04-11T15:10:00Z'),
+    },
+    {
+      id: 'inc-02',
+      bookingId: 'bk-demo-103',
+      reportedBy: 'usr-customer-1',
+      reportedByRole: 'CUSTOMER',
+      vehicleId: 'veh-car-02',
+      driverId: 'drv-01',
+      category: 'LATE_RETURN',
+      priority: 'LOW',
+      status: 'OPEN',
+      title: 'Traffic delay on return leg',
+      description: 'Heavy traffic on Silk Board junction may cause a 30-minute late handover. Notified host in advance.',
+      location: 'Hosur Road, Bengaluru',
+      emergencyContactUsed: false,
+      assignedAgentId: null,
+      resolutionNotes: null,
+      createdAt: new Date('2024-04-27T17:30:00Z'),
+      updatedAt: new Date('2024-04-27T17:30:00Z'),
+    },
+  ];
+
+  const supportTickets = [
+    {
+      id: 'tkt-01',
+      ticketNumber: 'VL-TKT-10029',
+      raisedBy: 'usr-customer-1',
+      raisedByRole: 'CUSTOMER',
+      category: 'BOOKING',
+      subject: 'Query regarding airport pickup zone',
+      description: 'Can the host deliver the vehicle to Terminal 2 rather than Terminal 1 at BLR airport?',
+      priority: 'LOW',
+      status: 'IN_PROGRESS',
+      bookingId: 'bk-demo-101',
+      assignedTo: 'usr-admin-1',
+      resolutionNotes: null,
+      createdAt: new Date('2024-04-05T10:00:00Z'),
+      updatedAt: new Date('2024-04-05T11:00:00Z'),
+    },
+  ];
+
+  const supportMessages = [
+    {
+      id: 'msg-01',
+      ticketId: 'tkt-01',
+      senderId: 'usr-customer-1',
+      senderName: 'Rahul Sharma',
+      senderRole: 'CUSTOMER',
+      message: 'Hello support team, I would like to request vehicle drop at Terminal 2 instead of Terminal 1.',
+      attachments: null,
+      createdAt: new Date('2024-04-05T10:00:00Z'),
+    },
+    {
+      id: 'msg-02',
+      ticketId: 'tkt-01',
+      senderId: 'usr-admin-1',
+      senderName: 'Priya Deshmukh (Support)',
+      senderRole: 'ADMIN',
+      message: 'Hi Rahul, we have coordinated with Apex Mobility. Terminal 2 handover is confirmed at no extra charge.',
+      attachments: null,
+      createdAt: new Date('2024-04-05T11:00:00Z'),
+    },
+  ];
+
+  const adminReviews = [
+    {
+      id: 'rev-01',
+      entityType: 'OWNER',
+      entityId: 'ov-01',
+      adminId: 'usr-admin-1',
+      action: 'APPROVE',
+      previousStatus: 'UNDER_REVIEW',
+      newStatus: 'VERIFIED',
+      reason: 'Verified voter ID and bank account IFSC documentation. Payout enabled.',
+      createdAt: new Date('2023-11-21T11:00:00Z'),
     },
   ];
 
@@ -517,6 +945,22 @@ export function getInitialSeedData() {
     payments,
     statusHistories,
     auditLogs,
+    organisations,
+    fleetMembers,
+    fleetLocations,
+    fleetAssignments,
+    ownerVerifications,
+    driverProfiles,
+    driverAssignments,
+    complianceRules,
+    complianceVersions,
+    expiryNotifications,
+    handovers,
+    returns: returnRecords,
+    incidents,
+    supportTickets,
+    supportMessages,
+    adminReviews,
   };
 }
 
@@ -870,6 +1314,417 @@ export const db: any = {
       const isConnected = await checkPostgresConnection();
       if (isConnected) return (prisma.auditLog.findMany as any)({ where, orderBy: { createdAt: 'desc' } });
       return [...globalForPrisma.dbStore.auditLogs];
+    },
+  },
+
+  // Business Organisations & Fleet
+  businessOrganisation: {
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).businessOrganisation.findUnique({ where, include: { members: true, locations: true, assignments: true } });
+      return globalForPrisma.dbStore.organisations.find((o: any) => o.id === where.id) || null;
+    },
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).businessOrganisation.findMany({ where });
+      return [...globalForPrisma.dbStore.organisations];
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).businessOrganisation.create({ data });
+      const id = data.id || `org-${Date.now().toString().slice(-6)}`;
+      const org = { ...data, id, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.organisations.push(org);
+      return org;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).businessOrganisation.update({ where, data });
+      const idx = globalForPrisma.dbStore.organisations.findIndex((o: any) => o.id === where.id);
+      if (idx >= 0) {
+        globalForPrisma.dbStore.organisations[idx] = { ...globalForPrisma.dbStore.organisations[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.organisations[idx];
+      }
+      return null;
+    },
+  },
+
+  fleetMember: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetMember.findMany({ where });
+      let list = [...globalForPrisma.dbStore.fleetMembers];
+      if (where?.orgId) list = list.filter((m) => m.orgId === where.orgId);
+      if (where?.userId) list = list.filter((m) => m.userId === where.userId);
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetMember.create({ data });
+      const id = data.id || `fm-${Date.now()}`;
+      const mem = { ...data, id, createdAt: new Date() };
+      globalForPrisma.dbStore.fleetMembers.push(mem);
+      return mem;
+    },
+  },
+
+  fleetLocation: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetLocation.findMany({ where });
+      let list = [...globalForPrisma.dbStore.fleetLocations];
+      if (where?.orgId) list = list.filter((l) => l.orgId === where.orgId);
+      if (where?.city) list = list.filter((l) => l.city.toLowerCase() === where.city.toLowerCase());
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetLocation.create({ data });
+      const id = data.id || `loc-${Date.now().toString().slice(-6)}`;
+      const loc = { ...data, id, createdAt: new Date() };
+      globalForPrisma.dbStore.fleetLocations.push(loc);
+      return loc;
+    },
+  },
+
+  fleetVehicleAssignment: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetVehicleAssignment.findMany({ where, include: { location: true } });
+      let list = [...globalForPrisma.dbStore.fleetAssignments];
+      if (where?.orgId) list = list.filter((a) => a.orgId === where.orgId);
+      if (where?.vehicleId) list = list.filter((a) => a.vehicleId === where.vehicleId);
+      return list.map((a) => ({
+        ...a,
+        location: globalForPrisma.dbStore.fleetLocations.find((l: any) => l.id === a.locationId) || null,
+      }));
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).fleetVehicleAssignment.create({ data });
+      const id = data.id || `fa-${Date.now()}`;
+      const assign = { ...data, id, assignedAt: new Date() };
+      globalForPrisma.dbStore.fleetAssignments.push(assign);
+      return assign;
+    },
+  },
+
+  // Owner Verification Application
+  ownerVerificationApplication: {
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).ownerVerificationApplication.findUnique({ where });
+      return globalForPrisma.dbStore.ownerVerifications.find((v: any) => (where.id && v.id === where.id) || (where.userId && v.userId === where.userId)) || null;
+    },
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).ownerVerificationApplication.findMany({ where });
+      let list = [...globalForPrisma.dbStore.ownerVerifications];
+      if (where?.status) list = list.filter((v) => v.status === where.status);
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).ownerVerificationApplication.create({ data });
+      const id = data.id || `ov-${Date.now().toString().slice(-6)}`;
+      const app = { ...data, id, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.ownerVerifications.push(app);
+      return app;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).ownerVerificationApplication.update({ where, data });
+      const idx = globalForPrisma.dbStore.ownerVerifications.findIndex((v: any) => (where.id && v.id === where.id) || (where.userId && v.userId === where.userId));
+      if (idx >= 0) {
+        globalForPrisma.dbStore.ownerVerifications[idx] = { ...globalForPrisma.dbStore.ownerVerifications[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.ownerVerifications[idx];
+      }
+      return null;
+    },
+  },
+
+  // Administrative Reviews
+  administrativeReview: {
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).administrativeReview.create({ data });
+      const id = data.id || `rev-${Date.now()}`;
+      const rev = { ...data, id, createdAt: new Date() };
+      globalForPrisma.dbStore.adminReviews.unshift(rev);
+      return rev;
+    },
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).administrativeReview.findMany({ where, orderBy: { createdAt: 'desc' } });
+      let list = [...globalForPrisma.dbStore.adminReviews];
+      if (where?.entityType) list = list.filter((r) => r.entityType === where.entityType);
+      if (where?.entityId) list = list.filter((r) => r.entityId === where.entityId);
+      return list;
+    },
+  },
+
+  // Driver Profiles & Assignments
+  extendedDriverProfile: {
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).extendedDriverProfile.findUnique({ where, include: { assignments: true } });
+      return globalForPrisma.dbStore.driverProfiles.find((d: any) => (where.id && d.id === where.id) || (where.userId && d.userId === where.userId)) || null;
+    },
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).extendedDriverProfile.findMany({ where, include: { assignments: true } });
+      let list = [...globalForPrisma.dbStore.driverProfiles];
+      if (where?.availabilityStatus) list = list.filter((d) => d.availabilityStatus === where.availabilityStatus);
+      if (where?.orgId) list = list.filter((d) => d.orgId === where.orgId);
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).extendedDriverProfile.create({ data });
+      const id = data.id || `drv-${Date.now().toString().slice(-6)}`;
+      const drv = { ...data, id, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.driverProfiles.push(drv);
+      return drv;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).extendedDriverProfile.update({ where, data });
+      const idx = globalForPrisma.dbStore.driverProfiles.findIndex((d: any) => (where.id && d.id === where.id) || (where.userId && d.userId === where.userId));
+      if (idx >= 0) {
+        globalForPrisma.dbStore.driverProfiles[idx] = { ...globalForPrisma.dbStore.driverProfiles[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.driverProfiles[idx];
+      }
+      return null;
+    },
+  },
+
+  driverTripAssignment: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).driverTripAssignment.findMany({ where, include: { driver: true } });
+      let list = [...globalForPrisma.dbStore.driverAssignments];
+      if (where?.driverId) list = list.filter((a) => a.driverId === where.driverId);
+      if (where?.bookingId) list = list.filter((a) => a.bookingId === where.bookingId);
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).driverTripAssignment.create({ data });
+      const id = data.id || `dta-${Date.now()}`;
+      const assign = { ...data, id, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.driverAssignments.push(assign);
+      return assign;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).driverTripAssignment.update({ where, data });
+      const idx = globalForPrisma.dbStore.driverAssignments.findIndex((a: any) => a.id === where.id);
+      if (idx >= 0) {
+        globalForPrisma.dbStore.driverAssignments[idx] = { ...globalForPrisma.dbStore.driverAssignments[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.driverAssignments[idx];
+      }
+      return null;
+    },
+  },
+
+  // Compliance Rules & Versions
+  complianceRule: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRule.findMany({ where, include: { versions: true } });
+      let list = [...globalForPrisma.dbStore.complianceRules];
+      if (where?.jurisdictionState) list = list.filter((r) => r.jurisdictionState === where.jurisdictionState);
+      if (where?.vehicleCategory) list = list.filter((r) => r.vehicleCategory === where.vehicleCategory);
+      if (where?.rentalModel) list = list.filter((r) => r.rentalModel === where.rentalModel);
+      if (where?.status) list = list.filter((r) => r.status === where.status);
+      return list;
+    },
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRule.findUnique({ where, include: { versions: true } });
+      return globalForPrisma.dbStore.complianceRules.find((r: any) => (where.id && r.id === where.id) || (where.ruleId && r.ruleId === where.ruleId)) || null;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRule.create({ data });
+      const id = data.id || `cr-${Date.now()}`;
+      const rule = { ...data, id, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.complianceRules.push(rule);
+      return rule;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRule.update({ where, data });
+      const idx = globalForPrisma.dbStore.complianceRules.findIndex((r: any) => (where.id && r.id === where.id) || (where.ruleId && r.ruleId === where.ruleId));
+      if (idx >= 0) {
+        globalForPrisma.dbStore.complianceRules[idx] = { ...globalForPrisma.dbStore.complianceRules[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.complianceRules[idx];
+      }
+      return null;
+    },
+  },
+
+  complianceRuleVersion: {
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRuleVersion.create({ data });
+      const id = data.id || `crv-${Date.now()}`;
+      const v = { ...data, id, createdAt: new Date() };
+      globalForPrisma.dbStore.complianceVersions.push(v);
+      return v;
+    },
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).complianceRuleVersion.findMany({ where });
+      return [...globalForPrisma.dbStore.complianceVersions];
+    },
+  },
+
+  // Document Expiry Notifications
+  documentExpiryNotification: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).documentExpiryNotification.findMany({ where });
+      let list = [...globalForPrisma.dbStore.expiryNotifications];
+      if (where?.entityType) list = list.filter((n) => n.entityType === where.entityType);
+      if (where?.threshold) list = list.filter((n) => n.threshold === where.threshold);
+      return list;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).documentExpiryNotification.create({ data });
+      const id = data.id || `exp-${Date.now()}`;
+      const n = { ...data, id, notifiedAt: new Date() };
+      globalForPrisma.dbStore.expiryNotifications.unshift(n);
+      return n;
+    },
+  },
+
+  // Handover & Return
+  bookingHandover: {
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).bookingHandover.findUnique({ where });
+      return globalForPrisma.dbStore.handovers.find((h: any) => (where.bookingId && h.bookingId === where.bookingId) || (where.id && h.id === where.id)) || null;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).bookingHandover.create({ data });
+      const id = data.id || `ho-${Date.now()}`;
+      const ho = { ...data, id, completedAt: new Date() };
+      globalForPrisma.dbStore.handovers.push(ho);
+      return ho;
+    },
+  },
+
+  bookingReturnRecord: {
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).bookingReturnRecord.findUnique({ where });
+      return globalForPrisma.dbStore.returns.find((r: any) => (where.bookingId && r.bookingId === where.bookingId) || (where.id && r.id === where.id)) || null;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).bookingReturnRecord.create({ data });
+      const id = data.id || `ret-${Date.now()}`;
+      const ret = { ...data, id, completedAt: new Date() };
+      globalForPrisma.dbStore.returns.push(ret);
+      return ret;
+    },
+  },
+
+  // Incident Reports
+  incidentReport: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).incidentReport.findMany({ where, include: { attachments: true }, orderBy: { createdAt: 'desc' } });
+      let list = [...globalForPrisma.dbStore.incidents];
+      if (where?.status) list = list.filter((i) => i.status === where.status);
+      if (where?.priority) list = list.filter((i) => i.priority === where.priority);
+      return list;
+    },
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).incidentReport.findUnique({ where, include: { attachments: true } });
+      return globalForPrisma.dbStore.incidents.find((i: any) => i.id === where.id) || null;
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).incidentReport.create({ data });
+      const id = data.id || `inc-${Date.now()}`;
+      const inc = { ...data, id, createdAt: new Date(), updatedAt: new Date(), attachments: [] };
+      globalForPrisma.dbStore.incidents.unshift(inc);
+      return inc;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).incidentReport.update({ where, data });
+      const idx = globalForPrisma.dbStore.incidents.findIndex((i: any) => i.id === where.id);
+      if (idx >= 0) {
+        globalForPrisma.dbStore.incidents[idx] = { ...globalForPrisma.dbStore.incidents[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.incidents[idx];
+      }
+      return null;
+    },
+  },
+
+  // Support Tickets & Messages
+  supportTicket: {
+    async findMany({ where }: any = {}) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).supportTicket.findMany({ where, include: { messages: true }, orderBy: { updatedAt: 'desc' } });
+      let list = [...globalForPrisma.dbStore.supportTickets];
+      if (where?.raisedBy) list = list.filter((t) => t.raisedBy === where.raisedBy);
+      if (where?.status) list = list.filter((t) => t.status === where.status);
+      return list.map((t) => ({
+        ...t,
+        messages: globalForPrisma.dbStore.supportMessages.filter((m: any) => m.ticketId === t.id),
+      }));
+    },
+    async findUnique({ where }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).supportTicket.findUnique({ where, include: { messages: true } });
+      const t = globalForPrisma.dbStore.supportTickets.find((tick: any) => tick.id === where.id || tick.ticketNumber === where.ticketNumber);
+      if (!t) return null;
+      return {
+        ...t,
+        messages: globalForPrisma.dbStore.supportMessages.filter((m: any) => m.ticketId === t.id),
+      };
+    },
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).supportTicket.create({ data });
+      const id = data.id || `tkt-${Date.now().toString().slice(-6)}`;
+      const num = `VL-TKT-${Math.floor(10000 + Math.random() * 90000)}`;
+      const ticket = { ...data, id, ticketNumber: num, createdAt: new Date(), updatedAt: new Date() };
+      globalForPrisma.dbStore.supportTickets.unshift(ticket);
+      return ticket;
+    },
+    async update({ where, data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).supportTicket.update({ where, data });
+      const idx = globalForPrisma.dbStore.supportTickets.findIndex((t: any) => t.id === where.id);
+      if (idx >= 0) {
+        globalForPrisma.dbStore.supportTickets[idx] = { ...globalForPrisma.dbStore.supportTickets[idx], ...data, updatedAt: new Date() };
+        return globalForPrisma.dbStore.supportTickets[idx];
+      }
+      return null;
+    },
+  },
+
+  supportMessage: {
+    async create({ data }: any) {
+      const isConnected = await checkPostgresConnection();
+      if (isConnected) return (prisma as any).supportMessage.create({ data });
+      const id = data.id || `msg-${Date.now()}`;
+      const msg = { ...data, id, createdAt: new Date() };
+      globalForPrisma.dbStore.supportMessages.push(msg);
+      // update ticket updatedAt
+      const tIdx = globalForPrisma.dbStore.supportTickets.findIndex((t: any) => t.id === data.ticketId);
+      if (tIdx >= 0) {
+        globalForPrisma.dbStore.supportTickets[tIdx].updatedAt = new Date();
+      }
+      return msg;
     },
   },
 

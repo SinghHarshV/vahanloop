@@ -70,9 +70,11 @@ export type BookingStatus =
   | 'requested'
   | 'awaiting_payment'
   | 'confirmed'
+  | 'active'
   | 'rejected'
   | 'cancelled'
-  | 'completed';
+  | 'completed'
+  | 'expired';
 
 export interface SimulatedPayment {
   paidAt: string;

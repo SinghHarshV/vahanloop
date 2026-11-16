@@ -10,11 +10,11 @@ import {
   XCircle,
   Clock,
   Calendar,
-  User,
   IndianRupee,
   Car,
   Check,
   X,
+  User,
 } from 'lucide-react';
 
 export default function BookingRequestsPage() {
@@ -38,21 +38,20 @@ export default function BookingRequestsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-8 pb-16">
       <OwnerNav />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+        <div className="pb-6 border-b border-brand-border">
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-brand-navy">
             Booking Requests & Approvals
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Review guest reservation requests, verify dates, and accept to allow customers to
-            simulate checkout.
+          <p className="text-xs sm:text-sm text-brand-text-muted mt-1">
+            Review guest reservation requests, verify dates, and accept to allow customers to complete checkout.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {ownerBookings.length > 0 ? (
             ownerBookings.map((bk) => {
               const isPending = bk.status === 'requested';
@@ -63,101 +62,108 @@ export default function BookingRequestsPage() {
               return (
                 <div
                   key={bk.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-4"
+                  className="bg-white rounded-3xl border border-brand-border shadow-card hover:shadow-card-hover transition-all p-6 space-y-5"
                 >
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-brand-border pb-4">
                     <div>
-                      <span className="text-[10px] font-mono text-slate-400">ID: {bk.id}</span>
-                      <h3 className="text-base font-bold text-slate-900">{bk.vehicleTitle}</h3>
+                      <span className="text-[10px] font-mono uppercase font-bold text-brand-text-muted">
+                        Reservation #{bk.id}
+                      </span>
+                      <h3 className="text-lg font-display font-bold text-brand-navy mt-0.5">{bk.vehicleTitle}</h3>
                     </div>
 
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                         isConfirmed
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-brand-emerald-subtle text-brand-emerald border-brand-emerald/20'
                           : isAwaitingPayment
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-blue-500/10 text-blue-700 border-blue-500/20 animate-pulse'
                           : isPending
-                          ? 'bg-amber-100 text-amber-800 animate-pulse'
-                          : isRejected
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-slate-100 text-slate-700'
+                          ? 'bg-amber-500/10 text-amber-700 border-amber-500/20'
+                          : 'bg-brand-danger/10 text-brand-danger border-brand-danger/20'
                       }`}
                     >
-                      {bk.status.replace('_', ' ')}
+                      {isConfirmed && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      {isPending && <Clock className="w-3.5 h-3.5" />}
+                      {isRejected && <XCircle className="w-3.5 h-3.5" />}
+                      <span>{bk.status.replace(/_/g, ' ')}</span>
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                     {/* Customer Info */}
-                    <div className="space-y-1">
-                      <p className="text-slate-400 font-medium">Guest Profile</p>
-                      <p className="font-bold text-slate-800">{bk.customerName}</p>
-                      <p className="text-slate-500">{bk.customerEmail}</p>
-                      <p className="text-slate-500">{bk.customerPhone || '+91 98765 43210'}</p>
+                    <div className="p-3.5 bg-brand-surface rounded-2xl border border-brand-border/60 space-y-1">
+                      <p className="text-[10px] font-bold uppercase text-brand-text-muted">Guest</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="w-7 h-7 rounded-xl bg-brand-navy text-white flex items-center justify-center font-bold text-xs shrink-0">
+                          {bk.customerName.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-brand-navy text-sm leading-tight">{bk.customerName}</p>
+                          <p className="text-brand-text-muted text-[10px]">{bk.customerEmail}</p>
+                        </div>
+                      </div>
+                      <p className="text-brand-text-muted mt-1">{bk.customerPhone || '+91 98765 43210'}</p>
                     </div>
 
                     {/* Schedule */}
-                    <div className="space-y-1">
-                      <p className="text-slate-400 font-medium">Trip Window</p>
-                      <p className="font-bold text-slate-800">
-                        {bk.startDate} &rarr; {bk.endDate}
+                    <div className="p-3.5 bg-brand-surface rounded-2xl border border-brand-border/60 space-y-1">
+                      <p className="text-[10px] font-bold uppercase text-brand-text-muted">Trip Window</p>
+                      <p className="font-bold text-brand-navy text-sm mt-1">
+                        {bk.startDate} → {bk.endDate}
                       </p>
-                      <p className="text-slate-500">
-                        Duration: {bk.totalDays} {bk.totalDays === 1 ? 'day' : 'days'}
-                      </p>
-                      <p className="text-slate-600 capitalize">
-                        Mode: {bk.rentalType.replace('-', ' ')}
+                      <p className="text-brand-text-muted">
+                        {bk.totalDays} {bk.totalDays === 1 ? 'day' : 'days'} · {bk.rentalType.replace('-', ' ')}
                       </p>
                     </div>
 
                     {/* Financials */}
-                    <div className="space-y-1">
-                      <p className="text-slate-400 font-medium">Simulated Partner Revenue</p>
-                      <p className="text-base font-black text-slate-900">
+                    <div className="p-3.5 bg-brand-surface rounded-2xl border border-brand-border/60 space-y-1">
+                      <p className="text-[10px] font-bold uppercase text-brand-text-muted">Your Revenue</p>
+                      <p className="text-xl font-display font-black text-brand-navy mt-1">
                         ₹{bk.ownerEarnings.toLocaleString('en-IN')}
                       </p>
-                      <p className="text-[11px] text-slate-400">
-                        Gross: ₹{bk.totalAmount} (Comm: ₹{bk.platformCommission})
+                      <p className="text-[10px] text-brand-text-muted">
+                        Gross: ₹{bk.totalAmount.toLocaleString('en-IN')} · Platform fee: ₹{bk.platformCommission.toLocaleString('en-IN')}
                       </p>
                     </div>
 
                     {/* Action Controls */}
-                    <div className="flex flex-col justify-center items-start md:items-end">
+                    <div className="flex flex-col justify-center gap-2">
                       {isPending && (
-                        <div className="flex gap-2 w-full md:w-auto">
+                        <>
                           <button
                             onClick={() => handleAccept(bk.id)}
-                            className="flex-1 md:flex-initial px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm text-xs transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full px-4 py-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold rounded-full text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
                           >
                             <Check className="w-3.5 h-3.5" />
                             Accept Request
                           </button>
                           <button
                             onClick={() => setRejectingBookingId(bk.id)}
-                            className="flex-1 md:flex-initial px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-1"
+                            className="w-full px-3 py-2 bg-brand-surface hover:bg-brand-danger/10 hover:text-brand-danger text-brand-text-muted font-semibold rounded-full text-xs border border-brand-border transition-all flex items-center justify-center gap-1"
                           >
                             <X className="w-3.5 h-3.5" />
                             Decline
                           </button>
-                        </div>
+                        </>
                       )}
 
                       {isAwaitingPayment && (
-                        <p className="text-xs text-blue-700 font-semibold bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">
-                          Accepted. Awaiting customer payment simulation.
+                        <p className="text-xs text-blue-700 font-semibold bg-blue-500/10 px-3 py-2 rounded-xl border border-blue-500/20 text-center">
+                          Accepted · Awaiting customer payment
                         </p>
                       )}
 
                       {isConfirmed && (
-                        <p className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1">
+                        <p className="text-xs text-brand-emerald font-semibold bg-brand-emerald-subtle px-3 py-2 rounded-xl border border-brand-emerald/20 flex items-center justify-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Payment Confirmed
                         </p>
                       )}
 
                       {isRejected && (
-                        <p className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-200">
+                        <p className="text-xs text-brand-danger font-semibold bg-brand-danger/10 px-3 py-2 rounded-xl border border-brand-danger/20 text-center">
                           Declined: {bk.rejectionReason || 'Unavailable'}
                         </p>
                       )}
@@ -166,26 +172,26 @@ export default function BookingRequestsPage() {
 
                   {/* Inline Rejection Reason Box */}
                   {rejectingBookingId === bk.id && (
-                    <div className="mt-3 p-3 bg-rose-50 rounded-xl border border-rose-200 space-y-2 text-xs">
-                      <label className="block font-bold text-rose-900">
-                        Reason for declining request:
+                    <div className="mt-3 p-4 bg-brand-danger/5 rounded-2xl border border-brand-danger/20 space-y-3 text-xs">
+                      <label className="block font-bold text-brand-navy">
+                        Reason for declining this request:
                       </label>
                       <input
                         type="text"
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
-                        className="w-full px-3 py-1.5 rounded-lg border border-rose-300 bg-white"
+                        className="w-full px-3 py-2 rounded-xl border border-brand-border bg-white text-brand-navy text-xs focus:outline-none focus:ring-2 focus:ring-brand-danger"
                       />
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleConfirmReject(bk.id)}
-                          className="px-3 py-1 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700"
+                          className="px-4 py-1.5 bg-brand-danger text-white rounded-full font-bold text-xs hover:bg-red-700"
                         >
                           Confirm Decline
                         </button>
                         <button
                           onClick={() => setRejectingBookingId(null)}
-                          className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg font-medium"
+                          className="px-4 py-1.5 bg-brand-surface text-brand-text rounded-full font-semibold text-xs border border-brand-border"
                         >
                           Cancel
                         </button>
@@ -196,8 +202,12 @@ export default function BookingRequestsPage() {
               );
             })
           ) : (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center text-xs text-slate-400">
-              No booking requests received yet.
+            <div className="bg-white rounded-3xl border border-brand-border p-12 text-center shadow-card space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-brand-surface flex items-center justify-center mx-auto">
+                <Inbox className="w-7 h-7 text-brand-text-muted stroke-[1.5]" />
+              </div>
+              <h3 className="font-display font-bold text-brand-navy">No booking requests yet</h3>
+              <p className="text-xs text-brand-text-muted">Guest requests will appear here when customers book your vehicles.</p>
             </div>
           )}
         </div>

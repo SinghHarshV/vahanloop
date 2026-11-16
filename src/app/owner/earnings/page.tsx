@@ -26,97 +26,96 @@ export default function OwnerEarningsPage() {
   const netEarnings = confirmedOrCompleted.reduce((acc, curr) => acc + curr.ownerEarnings, 0);
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-8 pb-16">
       <OwnerNav />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="pb-6 border-b border-brand-border">
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-brand-navy">
             Partner Revenue & Settlements
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-brand-text-muted mt-1">
             Simulated demonstration payout ledger for host{' '}
-            <strong className="text-slate-800">{currentUser?.name || 'Partner'}</strong>.
+            <strong className="text-brand-navy">{currentUser?.name || 'Partner'}</strong>.
           </p>
         </div>
 
         {/* Sandbox Notice */}
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2.5">
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 flex items-start gap-2.5">
           <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <strong>Demonstration Ledger:</strong> In this MVP prototype, all financial values and
-            payouts are simulated demonstration figures. No real bank accounts or escrow services
-            are integrated.
+            <strong>Demonstration Ledger:</strong> In this prototype, all financial values and payouts are
+            simulated. No real bank accounts or escrow services are connected.
           </div>
         </div>
 
         {/* Revenue Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="text-xs font-bold uppercase tracking-wider">Gross Booking Value</span>
-              <TrendingUp className="w-4 h-4 text-slate-600" />
+          <div className="bg-white p-6 rounded-3xl border border-brand-border shadow-card space-y-2">
+            <div className="flex items-center justify-between text-brand-text-muted">
+              <span className="text-xs font-bold uppercase tracking-wider">Gross Trip Value</span>
+              <TrendingUp className="w-4 h-4 text-brand-navy" />
             </div>
-            <p className="text-3xl font-black text-slate-900">
+            <p className="text-3xl font-display font-black text-brand-navy">
               ₹{grossBookingValue.toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-400">Total customer trip spend</p>
+            <p className="text-xs text-brand-text-muted">Total customer trip spend</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="text-xs font-bold uppercase tracking-wider">Platform Take (10%)</span>
-              <ArrowDownRight className="w-4 h-4 text-blue-600" />
+          <div className="bg-white p-6 rounded-3xl border border-brand-border shadow-card space-y-2">
+            <div className="flex items-center justify-between text-brand-text-muted">
+              <span className="text-xs font-bold uppercase tracking-wider">Platform Fee (10%)</span>
+              <ArrowDownRight className="w-4 h-4 text-blue-500" />
             </div>
-            <p className="text-3xl font-black text-blue-700">
+            <p className="text-3xl font-display font-black text-blue-600">
               ₹{totalCommission.toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-400">VahanLoop service & insurance fee</p>
+            <p className="text-xs text-brand-text-muted">VahanLoop marketplace commission</p>
           </div>
 
-          <div className="bg-emerald-50/60 p-6 rounded-3xl border border-emerald-200 shadow-sm space-y-2">
-            <div className="flex items-center justify-between text-emerald-800">
+          <div className="bg-brand-emerald-subtle p-6 rounded-3xl border border-brand-emerald/20 shadow-card space-y-2">
+            <div className="flex items-center justify-between text-brand-emerald">
               <span className="text-xs font-bold uppercase tracking-wider">Net Partner Payout</span>
-              <Wallet className="w-4 h-4 text-emerald-600" />
+              <Wallet className="w-4 h-4 text-brand-emerald" />
             </div>
-            <p className="text-3xl font-black text-emerald-700">
+            <p className="text-3xl font-display font-black text-brand-emerald">
               ₹{netEarnings.toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-emerald-600 font-medium">Ready for simulated settlement</p>
+            <p className="text-xs text-brand-emerald font-medium">Ready for simulated settlement</p>
           </div>
         </div>
 
         {/* Transaction History Table */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <h2 className="text-base font-bold text-slate-900">Settlement Ledger (Simulated)</h2>
+        <div className="bg-white rounded-3xl border border-brand-border shadow-card p-7 space-y-5">
+          <h2 className="text-lg font-display font-bold text-brand-navy">Settlement Ledger (Simulated)</h2>
 
           {confirmedOrCompleted.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-100 text-slate-400 uppercase tracking-wider text-[10px]">
-                    <th className="pb-3">Booking ID</th>
-                    <th className="pb-3">Vehicle</th>
-                    <th className="pb-3">Customer</th>
-                    <th className="pb-3">Dates</th>
-                    <th className="pb-3">Gross</th>
-                    <th className="pb-3">Commission</th>
-                    <th className="pb-3 text-right">Net Payout</th>
+                  <tr className="border-b border-brand-border text-brand-text-muted uppercase tracking-wider text-[10px]">
+                    <th className="pb-3 font-bold">Booking ID</th>
+                    <th className="pb-3 font-bold">Vehicle</th>
+                    <th className="pb-3 font-bold">Guest</th>
+                    <th className="pb-3 font-bold">Dates</th>
+                    <th className="pb-3 font-bold">Gross</th>
+                    <th className="pb-3 font-bold">Commission</th>
+                    <th className="pb-3 text-right font-bold">Net Payout</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-brand-border/60">
                   {confirmedOrCompleted.map((b) => (
-                    <tr key={b.id} className="py-2.5">
-                      <td className="py-3 font-mono text-[11px] text-slate-500">{b.id}</td>
-                      <td className="py-3 font-semibold text-slate-800">{b.vehicleTitle}</td>
-                      <td className="py-3 text-slate-600">{b.customerName}</td>
-                      <td className="py-3 text-slate-500">
-                        {b.startDate} to {b.endDate}
+                    <tr key={b.id} className="hover:bg-brand-surface/50 transition-colors">
+                      <td className="py-3 font-mono text-[10px] text-brand-text-muted">{b.id}</td>
+                      <td className="py-3 font-semibold text-brand-navy">{b.vehicleTitle}</td>
+                      <td className="py-3 text-brand-text-muted">{b.customerName}</td>
+                      <td className="py-3 text-brand-text-muted">
+                        {b.startDate} → {b.endDate}
                       </td>
-                      <td className="py-3 text-slate-600">₹{b.totalAmount}</td>
-                      <td className="py-3 text-blue-600">₹{b.platformCommission}</td>
-                      <td className="py-3 text-right font-bold text-emerald-700">
-                        ₹{b.ownerEarnings}
+                      <td className="py-3 text-brand-navy font-semibold">₹{b.totalAmount.toLocaleString('en-IN')}</td>
+                      <td className="py-3 text-blue-600 font-semibold">₹{b.platformCommission.toLocaleString('en-IN')}</td>
+                      <td className="py-3 text-right font-bold text-brand-emerald text-sm">
+                        ₹{b.ownerEarnings.toLocaleString('en-IN')}
                       </td>
                     </tr>
                   ))}
@@ -124,9 +123,8 @@ export default function OwnerEarningsPage() {
               </table>
             </div>
           ) : (
-            <div className="py-8 text-center text-xs text-slate-400">
-              No confirmed bookings yet. Payouts will appear once guests complete reservation
-              payments.
+            <div className="py-10 text-center text-xs text-brand-text-muted">
+              No confirmed bookings yet. Payouts will appear once guests complete reservation payments.
             </div>
           )}
         </div>

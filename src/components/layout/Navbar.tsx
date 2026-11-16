@@ -119,22 +119,44 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {currentUser && (
-              <Link
-                href="/bookings"
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
-                  isActive('/bookings')
-                    ? 'text-brand-emerald bg-brand-emerald-subtle border border-brand-emerald/20 shadow-sm'
-                    : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
-                }`}
-              >
-                <CalendarCheck className="w-4 h-4" />
-                My Bookings
-                {customerBookingsCount > 0 && (
-                  <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-brand-emerald text-white rounded-full">
-                    {customerBookingsCount}
-                  </span>
-                )}
-              </Link>
+              <>
+                <Link
+                  href="/bookings"
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    isActive('/bookings')
+                      ? 'text-brand-emerald bg-brand-emerald-subtle border border-brand-emerald/20 shadow-sm'
+                      : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
+                  }`}
+                >
+                  <CalendarCheck className="w-4 h-4" />
+                  My Bookings
+                  {customerBookingsCount > 0 && (
+                    <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-brand-emerald text-white rounded-full">
+                      {customerBookingsCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/operations"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    isActive('/operations')
+                      ? 'text-brand-navy bg-brand-surface border border-brand-border font-bold'
+                      : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
+                  }`}
+                >
+                  Operations
+                </Link>
+                <Link
+                  href="/driver"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    isActive('/driver')
+                      ? 'text-brand-navy bg-brand-surface border border-brand-border font-bold'
+                      : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
+                  }`}
+                >
+                  Driver
+                </Link>
+              </>
             )}
 
             {primaryRole === 'owner' ? (

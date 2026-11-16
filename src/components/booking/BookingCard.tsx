@@ -65,6 +65,24 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
           icon: <FileCheck2 className="w-3.5 h-3.5" />,
           label: 'Completed Trip',
         };
+      case 'active':
+        return {
+          bg: 'bg-brand-emerald-subtle text-brand-emerald border-brand-emerald/30',
+          icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+          label: 'Active On-Road',
+        };
+      case 'expired':
+        return {
+          bg: 'bg-slate-100 text-brand-text-muted border-brand-border',
+          icon: <Clock className="w-3.5 h-3.5" />,
+          label: 'Hold Expired',
+        };
+      default:
+        return {
+          bg: 'bg-brand-surface text-brand-navy border-brand-border',
+          icon: <Clock className="w-3.5 h-3.5" />,
+          label: String(status),
+        };
     }
   };
 

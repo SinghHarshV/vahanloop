@@ -10,7 +10,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "node scripts/seed.mjs",
-    "test:api": "node scripts/test-api.mjs"
+    "test:api": "node scripts/test-api.mjs",
+    "test:phase3": "node scripts/test-phase3.mjs",
+    "test:phase5": "node scripts/test-phase5.mjs",
+    "test": "node scripts/test-phase3.mjs && node scripts/test-phase5.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

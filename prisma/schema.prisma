@@ -19,6 +19,73 @@ enum OwnerType {
   BUSINESS
 }
 
+enum VerificationStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  ADDITIONAL_INFORMATION_REQUIRED
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum DriverAvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  ON_DUTY
+  ASSIGNED
+  OFF_DUTY
+}
+
+enum IncidentCategory {
+  ACCIDENT
+  BREAKDOWN
+  THEFT
+  DAMAGE
+  LATE_RETURN
+  DRIVER_MISCONDUCT
+  CUSTOMER_COMPLAINT
+  SAFETY_EMERGENCY
+  PAYMENT_DISPUTE
+}
+
+enum IncidentStatus {
+  OPEN
+  ACKNOWLEDGED
+  INVESTIGATING
+  ACTION_REQUIRED
+  RESOLVED
+  CLOSED
+}
+
+enum IncidentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketCategory {
+  BOOKING
+  PAYMENT
+  CANCELLATION
+  VEHICLE_CONDITION
+  OWNER_BEHAVIOUR
+  DRIVER_BEHAVIOUR
+  REFUND
+  TECHNICAL
+  OTHER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_FOR_USER
+  RESOLVED
+  CLOSED
+}
+
 enum VehicleCategory {
   CAR
   BIKE
@@ -489,4 +556,332 @@ model AuditLog {
 
   @@index([actorId])
   @@index([entityType, entityId])
+}
+
+model BusinessOrganisation {
+  id                 String             @id @default(uuid())
+  businessName       String
+  businessType       String             // PVT_LTD, LLP, PARTNERSHIP, PROPRIETORSHIP
+  registeredAddress  String
+  panNumber          String?
+  gstin              String?
+  contactPerson      String
+  contactEmail       String
+  contactPhone       String
+  verificationStatus VerificationStatus @default(NOT_STARTED)
+  rejectionReason    String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  members            FleetMember[]
+  locations          FleetLocation[]
+  assignments        FleetVehicleAssignment[]
+}
+
+model FleetMember {
+  id          String               @id @default(uuid())
+  orgId       String
+  userId      String
+  role        String               @default("STAFF") // OWNER, FLEET_MANAGER, DISPATCHER, STAFF
+  permissions String               @default("VIEW_FLEET,MANAGE_BOOKINGS")
+  createdAt   DateTime             @default(now())
+
+  organisation BusinessOrganisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([userId])
+}
+
+model FleetLocation {
+  id                 String               @id @default(uuid())
+  orgId              String
+  name               String
+  address            String
+  city               String
+  postalCode         String
+  latitude           Float?
+  longitude          Float?
+  contactPerson      String
+  contactNumber      String
+  operatingHours     String               @default("08:00 - 20:00")
+  pickupInstructions String?
+  isActive           Boolean              @default(true)
+  createdAt          DateTime             @default(now())
+
+  organisation       BusinessOrganisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  assignments        FleetVehicleAssignment[]
+
+  @@index([orgId])
+  @@index([city])
+}
+
+model FleetVehicleAssignment {
+  id           String               @id @default(uuid())
+  vehicleId    String               @unique
+  orgId        String
+  locationId   String?
+  assignedAt   DateTime             @default(now())
+
+  organisation BusinessOrganisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  location     FleetLocation?       @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([orgId])
+  @@index([locationId])
+}
+
+model OwnerVerificationApplication {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  ownerType              OwnerType          @default(INDIVIDUAL)
+  currentStep            Int                @default(1)
+  status                 VerificationStatus @default(NOT_STARTED)
+  fullName               String
+  email                  String
+  mobile                 String
+  address                String?
+  profilePhotoUrl        String?
+  idVerificationMethod   String?            // MANUAL_PASSPORT, MANUAL_VOTER_ID, MANUAL_PAN
+  idVerificationRef      String?            // Synthetic/mock reference ID
+  bankAccountHolder      String?
+  bankVerificationStatus String             @default("PENDING") // PENDING, VERIFIED, FAILED
+  bankVerificationRef    String?
+  payoutEligible         Boolean            @default(false)
+  termsAccepted          Boolean            @default(false)
+  termsVersion           String?            @default("v1.2")
+  termsAcceptedAt        DateTime?
+  submittedAt            DateTime?
+  reviewedBy             String?
+  reviewedAt             DateTime?
+  rejectionReason        String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([status])
+}
+
+model AdministrativeReview {
+  id             String   @id @default(uuid())
+  entityType     String   // OWNER, VEHICLE, DRIVER, DOCUMENT, INCIDENT, DISPUTE
+  entityId       String
+  adminId        String
+  action         String   // APPROVE, REJECT, REQUEST_INFO, SUSPEND, RESOLVE
+  previousStatus String?
+  newStatus      String
+  reason         String   @db.Text
+  createdAt      DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([adminId])
+}
+
+model ExtendedDriverProfile {
+  id                        String                   @id @default(uuid())
+  userId                    String                   @unique
+  fullName                  String
+  phone                     String
+  email                     String
+  address                   String?
+  licenceCategory           String                   @default("LMV") // LMV, HMV, MCWG
+  licenceNumber             String?
+  licenceVerificationStatus VerificationStatus       @default(NOT_STARTED)
+  backgroundScreeningStatus VerificationStatus       @default(NOT_STARTED)
+  employmentType            String                   @default("CONTRACTOR") // FULL_TIME, PART_TIME, CONTRACTOR
+  orgId                     String?
+  availabilityStatus        DriverAvailabilityStatus @default(AVAILABLE)
+  currentLatitude           Float?
+  currentLongitude          Float?
+  rating                    Float                    @default(5.0)
+  totalTrips                Int                      @default(0)
+  rejectionReason           String?
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+
+  assignments               DriverTripAssignment[]
+
+  @@index([availabilityStatus])
+  @@index([orgId])
+}
+
+model DriverTripAssignment {
+  id              String         @id @default(uuid())
+  bookingId       String
+  driverId        String
+  status          String         @default("ASSIGNED") // ASSIGNED, ACCEPTED, REJECTED, STARTED, COMPLETED, CANCELLED
+  tripStartTime   DateTime?
+  tripEndTime     DateTime?
+  startOdometer   Int?
+  endOdometer     Int?
+  notes           String?
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  driver          ExtendedDriverProfile @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model ComplianceRule {
+  id                String   @id @default(uuid())
+  ruleId            String   @unique
+  jurisdictionState String   // e.g., 'KARNATAKA', 'MAHARASHTRA', 'DELHI'
+  jurisdictionCity  String?  // Optional city specific override, e.g. 'BENGALURU'
+  vehicleCategory   String   // CAR, BIKE, SCOOTER
+  rentalModel       String   // SELF_DRIVE, CHAUFFEUR
+  ownerCategory     String   // INDIVIDUAL, BUSINESS
+  requiredDocuments String   // Comma separated: 'RC,INSURANCE,PUC'
+  requiredPermits   String?  // Comma separated: 'COMMERCIAL_PERMIT,RENT_A_CAB'
+  status            String   @default("ACTIVE") // ACTIVE, INACTIVE, DRAFT
+  effectiveDate     DateTime @default(now())
+  expiryDate        DateTime?
+  sourceReference   String?  // e.g., 'Motor Vehicles Act 1988, Rent a Cab Scheme 1989'
+  reviewerNotes     String?  @db.Text
+  version           Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  versions          ComplianceRuleVersion[]
+
+  @@index([jurisdictionState, vehicleCategory, rentalModel])
+}
+
+model ComplianceRuleVersion {
+  id            String         @id @default(uuid())
+  ruleId        String
+  version       Int
+  changeSummary String
+  changedBy     String
+  snapshot      String         @db.Text // JSON string of rule state
+  createdAt     DateTime       @default(now())
+
+  rule          ComplianceRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+}
+
+model DocumentExpiryNotification {
+  id             String    @id @default(uuid())
+  entityType     String    // 'VEHICLE', 'DRIVER'
+  entityId       String
+  documentType   String
+  expiryDate     DateTime
+  daysRemaining  Int
+  threshold      Int       // 30, 15, 7, 0
+  notifiedAt     DateTime  @default(now())
+  status         String    @default("SENT") // SENT, ACKNOWLEDGED, RESOLVED
+
+  @@index([entityType, entityId])
+  @@index([threshold, status])
+}
+
+model BookingHandover {
+  id                String   @id @default(uuid())
+  bookingId         String   @unique
+  completedAt       DateTime @default(now())
+  verifiedBy        String
+  odometerReading   Int
+  fuelLevelPercent  Int
+  conditionRating   String   @default("GOOD")
+  notes             String?  @db.Text
+  photosJson        String?  @db.Text
+  customerConfirmed Boolean  @default(true)
+  handoverStatus    String   @default("COMPLETED")
+
+  @@index([bookingId])
+}
+
+model BookingReturnRecord {
+  id                String   @id @default(uuid())
+  bookingId         String   @unique
+  completedAt       DateTime @default(now())
+  verifiedBy        String
+  odometerReading   Int
+  fuelLevelPercent  Int
+  conditionRating   String   @default("GOOD")
+  notes             String?  @db.Text
+  photosJson        String?  @db.Text
+  disputeRaised     Boolean  @default(false)
+  disputeNotes      String?  @db.Text
+  returnStatus      String   @default("COMPLETED")
+
+  @@index([bookingId])
+}
+
+model IncidentReport {
+  id                   String           @id @default(uuid())
+  bookingId            String?
+  reportedBy           String
+  reportedByRole       String           @default("CUSTOMER") // CUSTOMER, OWNER, DRIVER, ADMIN
+  vehicleId            String?
+  driverId             String?
+  category             IncidentCategory @default(BREAKDOWN)
+  priority             IncidentPriority @default(MEDIUM)
+  status               IncidentStatus   @default(OPEN)
+  title                String
+  description          String           @db.Text
+  location             String?
+  emergencyContactUsed Boolean          @default(false)
+  assignedAgentId      String?
+  resolutionNotes      String?          @db.Text
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  attachments          IncidentAttachment[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([bookingId])
+}
+
+model IncidentAttachment {
+  id         String         @id @default(uuid())
+  incidentId String
+  fileUrl    String         @db.Text
+  fileType   String         @default("IMAGE")
+  caption    String?
+  createdAt  DateTime       @default(now())
+
+  incident   IncidentReport @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId])
+}
+
+model SupportTicket {
+  id              String         @id @default(uuid())
+  ticketNumber    String         @unique
+  raisedBy        String
+  raisedByRole    String         @default("CUSTOMER")
+  category        TicketCategory @default(BOOKING)
+  subject         String
+  description     String         @db.Text
+  priority        IncidentPriority @default(MEDIUM)
+  status          TicketStatus   @default(OPEN)
+  bookingId       String?
+  assignedTo      String?
+  resolutionNotes String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  messages        SupportMessage[]
+
+  @@index([status])
+  @@index([raisedBy])
+  @@index([ticketNumber])
+}
+
+model SupportMessage {
+  id          String        @id @default(uuid())
+  ticketId    String
+  senderId    String
+  senderName  String
+  senderRole  String        @default("CUSTOMER")
+  message     String        @db.Text
+  attachments String?       @db.Text // JSON list of file URLs
+  createdAt   DateTime      @default(now())
+
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
 }

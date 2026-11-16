@@ -38,10 +38,20 @@ export const OwnerNav: React.FC = () => {
       exact: true,
     },
     {
-      href: '/owner/vehicles',
-      label: 'My Fleet',
+      href: '/owner/onboarding',
+      label: 'Onboarding & KYC',
+      icon: <FileCheck2 className="w-4 h-4" />,
+    },
+    {
+      href: '/owner/fleet',
+      label: 'Fleet Operations',
       icon: <Car className="w-4 h-4" />,
       badge: ownerVehiclesCount > 0 ? ownerVehiclesCount : undefined,
+    },
+    {
+      href: '/owner/drivers',
+      label: 'Driver Roster',
+      icon: <ClipboardCheck className="w-4 h-4" />,
     },
     {
       href: '/owner/add-vehicle',
