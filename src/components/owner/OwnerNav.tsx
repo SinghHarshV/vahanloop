@@ -54,29 +54,29 @@ export const OwnerNav: React.FC = () => {
       label: 'Booking Requests',
       icon: <Inbox className="w-4 h-4" />,
       badge: pendingRequests > 0 ? pendingRequests : undefined,
-      badgeColor: 'bg-amber-500 text-white',
+      alert: pendingRequests > 0,
     },
     {
       href: '/owner/documents',
-      label: 'Document Centre',
+      label: 'Documents Safe',
       icon: <FileCheck2 className="w-4 h-4" />,
     },
     {
       href: '/owner/inspections',
-      label: 'Vehicle Inspections',
+      label: 'Inspections',
       icon: <ClipboardCheck className="w-4 h-4" />,
     },
     {
       href: '/owner/earnings',
-      label: 'Earnings & Payouts',
+      label: 'Earnings Ledger',
       icon: <IndianRupee className="w-4 h-4" />,
     },
   ];
 
   return (
-    <div className="bg-white border-b border-slate-200">
+    <div className="bg-white border-b border-brand-border sticky top-20 z-30 shadow-card">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center space-x-1 sm:space-x-2 py-3 overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-2.5 custom-scrollbar text-xs font-bold">
           {links.map((link) => {
             const isActive = link.exact
               ? pathname === link.href
@@ -86,20 +86,22 @@ export const OwnerNav: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
-                  isActive
-                    ? 'bg-amber-100 text-amber-900 shadow-sm'
-                    : link.highlight
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+                  link.highlight
+                    ? 'bg-brand-emerald text-white hover:bg-brand-emerald-dark shadow-sm'
+                    : isActive
+                    ? 'bg-brand-surface text-brand-navy border border-brand-border shadow-sm'
+                    : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
                 }`}
               >
                 {link.icon}
                 <span>{link.label}</span>
                 {link.badge !== undefined && (
                   <span
-                    className={`ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full ${
-                      link.badgeColor || 'bg-slate-200 text-slate-700'
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      link.alert
+                        ? 'bg-amber-500 text-white animate-pulse'
+                        : 'bg-brand-surface text-brand-navy border border-brand-border'
                     }`}
                   >
                     {link.badge}

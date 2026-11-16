@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { FilterState, VehicleCategory, RentalType, FuelType, Transmission } from '@/types';
-import { Search, RotateCcw, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, RotateCcw, SlidersHorizontal, ArrowUpDown, Fuel, Gauge, Sparkles } from 'lucide-react';
 
 interface VehicleFilterProps {
   filters: FilterState;
@@ -18,30 +18,45 @@ export const VehicleFilter: React.FC<VehicleFilterProps> = ({
   locations,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-5">
+    <div className="bg-white rounded-3xl border border-brand-border p-6 shadow-card space-y-6">
+      {/* Header with clear button */}
+      <div className="flex items-center justify-between pb-3 border-b border-brand-border">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4 text-brand-emerald" />
+          <span className="font-display font-bold text-sm text-brand-navy">Filters</span>
+        </div>
+        <button
+          onClick={onReset}
+          className="text-xs text-brand-text-muted hover:text-brand-danger flex items-center gap-1 font-semibold transition-colors"
+        >
+          <RotateCcw className="w-3 h-3" />
+          Reset All
+        </button>
+      </div>
+
       {/* Search Input */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-          Search Vehicles
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Keyword Search
         </label>
         <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-brand-text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={filters.searchQuery}
             onChange={(e) => onChange({ ...filters, searchQuery: e.target.value })}
-            placeholder="Search by model (e.g. Nexon, Classic, Activa)..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-slate-50/50"
+            placeholder="Search model, brand or city..."
+            className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-2xl border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-emerald bg-brand-surface/70 text-brand-navy"
           />
         </div>
       </div>
 
       {/* Category Selection */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-          Vehicle Category
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Category
         </label>
-        <div className="grid grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-xl">
+        <div className="grid grid-cols-4 gap-1.5 bg-brand-surface p-1.5 rounded-2xl border border-brand-border/60">
           {[
             { id: 'all', label: 'All' },
             { id: 'car', label: 'Cars' },
@@ -51,10 +66,10 @@ export const VehicleFilter: React.FC<VehicleFilterProps> = ({
             <button
               key={cat.id}
               onClick={() => onChange({ ...filters, category: cat.id as VehicleCategory | 'all' })}
-              className={`py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`py-2 text-xs font-bold rounded-xl transition-all ${
                 filters.category === cat.id
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-brand-navy text-white shadow-sm'
+                  : 'text-brand-text-muted hover:text-brand-navy'
               }`}
             >
               {cat.label}
@@ -65,22 +80,22 @@ export const VehicleFilter: React.FC<VehicleFilterProps> = ({
 
       {/* Rental Mode */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-          Rental Mode
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Rental Option
         </label>
-        <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
+        <div className="grid grid-cols-3 gap-1.5 bg-brand-surface p-1.5 rounded-2xl border border-brand-border/60">
           {[
             { id: 'all', label: 'All Modes' },
             { id: 'self-drive', label: 'Self Drive' },
-            { id: 'with-driver', label: 'With Chauffeur' },
+            { id: 'with-driver', label: 'Chauffeur' },
           ].map((mode) => (
             <button
               key={mode.id}
               onClick={() => onChange({ ...filters, rentalType: mode.id as RentalType | 'all' })}
-              className={`py-1.5 text-[11px] font-semibold rounded-lg transition-all ${
+              className={`py-2 text-[11px] font-bold rounded-xl transition-all ${
                 filters.rentalType === mode.id
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-brand-emerald text-white shadow-sm'
+                  : 'text-brand-text-muted hover:text-brand-navy'
               }`}
             >
               {mode.label}
@@ -89,17 +104,17 @@ export const VehicleFilter: React.FC<VehicleFilterProps> = ({
         </div>
       </div>
 
-      {/* Location Filter */}
+      {/* City / Hub Selection */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-          City / Area
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Pickup Hub / City
         </label>
         <select
           value={filters.location}
           onChange={(e) => onChange({ ...filters, location: e.target.value })}
-          className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="w-full px-3.5 py-2.5 text-xs font-semibold rounded-2xl border border-brand-border bg-brand-surface/70 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-emerald"
         >
-          <option value="all">All Locations</option>
+          <option value="all">All Locations in India</option>
           {locations.map((loc) => (
             <option key={loc} value={loc}>
               {loc}
@@ -108,75 +123,83 @@ export const VehicleFilter: React.FC<VehicleFilterProps> = ({
         </select>
       </div>
 
-      {/* Price Range Slider / Inputs */}
+      {/* Fuel Type */}
       <div>
-        <div className="flex items-center justify-between text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-          <span>Max Daily Price</span>
-          <span className="text-emerald-700 font-extrabold text-sm">
-            ₹{filters.maxPrice.toLocaleString('en-IN')}
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Fuel Type
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: 'all', label: 'Any Fuel' },
+            { id: 'petrol', label: 'Petrol' },
+            { id: 'diesel', label: 'Diesel' },
+            { id: 'electric', label: 'Electric (EV)' },
+          ].map((f) => (
+            <button
+              key={f.id}
+              onClick={() => onChange({ ...filters, fuelType: f.id as FuelType | 'all' })}
+              className={`py-2 px-3 text-xs font-semibold rounded-xl border text-center transition-all ${
+                filters.fuelType === f.id
+                  ? 'border-brand-navy bg-brand-navy text-white font-bold'
+                  : 'border-brand-border bg-white text-brand-text-muted hover:border-brand-border-dark'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Transmission */}
+      <div>
+        <label className="block text-[11px] font-bold text-brand-text-muted uppercase tracking-wider mb-2">
+          Transmission
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { id: 'all', label: 'Any' },
+            { id: 'manual', label: 'Manual' },
+            { id: 'automatic', label: 'Auto' },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => onChange({ ...filters, transmission: t.id as Transmission | 'all' })}
+              className={`py-2 text-xs font-semibold rounded-xl border text-center transition-all ${
+                filters.transmission === t.id
+                  ? 'border-brand-navy bg-brand-navy text-white font-bold'
+                  : 'border-brand-border bg-white text-brand-text-muted hover:border-brand-border-dark'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Slider */}
+      <div className="pt-2 border-t border-brand-border">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-[11px] font-bold text-brand-text-muted uppercase tracking-wider">
+            Max Daily Rate
+          </label>
+          <span className="text-xs font-bold text-brand-emerald">
+            ₹{filters.maxPrice.toLocaleString('en-IN')}/day
           </span>
         </div>
         <input
           type="range"
           min="400"
-          max="6000"
-          step="100"
+          max="8000"
+          step="200"
           value={filters.maxPrice}
           onChange={(e) => onChange({ ...filters, maxPrice: Number(e.target.value) })}
-          className="w-full accent-emerald-600 cursor-pointer"
+          className="w-full accent-brand-emerald h-1.5 bg-slate-200 rounded-lg cursor-pointer"
         />
-        <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-          <span>₹400/day</span>
-          <span>₹6,000/day</span>
+        <div className="flex justify-between text-[10px] text-brand-text-muted mt-1.5 font-medium">
+          <span>₹400</span>
+          <span>₹4,000</span>
+          <span>₹8,000+</span>
         </div>
-      </div>
-
-      {/* Fuel & Transmission Row */}
-      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-        <div>
-          <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Fuel Type
-          </label>
-          <select
-            value={filters.fuelType}
-            onChange={(e) => onChange({ ...filters, fuelType: e.target.value as FuelType | 'all' })}
-            className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/50"
-          >
-            <option value="all">Any Fuel</option>
-            <option value="petrol">Petrol</option>
-            <option value="diesel">Diesel</option>
-            <option value="electric">Electric</option>
-            <option value="cng">CNG</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Transmission
-          </label>
-          <select
-            value={filters.transmission}
-            onChange={(e) =>
-              onChange({ ...filters, transmission: e.target.value as Transmission | 'all' })
-            }
-            className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50/50"
-          >
-            <option value="all">Any</option>
-            <option value="manual">Manual</option>
-            <option value="automatic">Automatic</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Reset Button */}
-      <div className="pt-2">
-        <button
-          onClick={onReset}
-          className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Clear All Filters
-        </button>
       </div>
     </div>
   );

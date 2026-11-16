@@ -21,6 +21,9 @@ import {
   Clock,
   TrendingUp,
   Award,
+  ChevronRight,
+  ShieldAlert,
+  Fuel,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -31,6 +34,8 @@ export default function HomePage() {
   const [location, setLocation] = useState('Indiranagar, Bengaluru');
   const [category, setCategory] = useState<VehicleCategory | 'all'>('all');
   const [rentalType, setRentalType] = useState<RentalType | 'all'>('all');
+  const [startDate, setStartDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,218 +49,256 @@ export default function HomePage() {
   const featuredVehicles = approvedVehicles.slice(0, 4);
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Next-Generation Peer-to-Peer Mobility</span>
+    <div className="space-y-20 pb-20">
+      {/* Virtuo-Inspired Hero Banner with Floating Search Pill */}
+      <section className="relative px-3 sm:px-6 lg:px-8 pt-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Curved Hero Frame */}
+          <div className="relative rounded-3xl sm:rounded-[2.5rem] overflow-hidden bg-brand-navy shadow-floating min-h-[520px] sm:min-h-[580px] flex flex-col justify-between p-6 sm:p-12 lg:p-16 border border-brand-navy-light/40">
+            {/* Background Photographic Image & Overlays */}
+            <div className="absolute inset-0 z-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=85"
+                alt="Luxury Vehicle Road Trip"
+                className="w-full h-full object-cover object-center opacity-45 brightness-90 saturate-125"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/60 to-brand-navy/30" />
+              <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-emerald/15 rounded-full blur-3xl pointer-events-none" />
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
-              Find your <span className="text-emerald-400">perfect ride.</span>
-            </h1>
+            {/* Top Brand Pill & Subtitle */}
+            <div className="relative z-10 max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 mb-6 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-brand-emerald" />
+                <span>Peer-to-Peer Mobility · Instant Digital Booking</span>
+              </div>
 
-            <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-2xl font-normal leading-relaxed">
-              Rent cars and bikes from verified vehicle partners near you. Transparent pricing,
-              instant requests, and flexible self-drive or chauffeur options.
-            </p>
+              {/* Bold Virtuo-Style Headline */}
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight text-white leading-[1.08]">
+                Move Freely. <br />
+                <span className="text-brand-emerald">Rent Smarter.</span>
+              </h1>
+
+              <p className="mt-5 text-base sm:text-xl text-slate-200 max-w-2xl font-normal leading-relaxed">
+                Connect directly with verified individual owners and fleet hosts across India. Premium cars,
+                open-road cruisers, and city scooters with zero hidden fees.
+              </p>
+            </div>
+
+            {/* Quick Stat Badges */}
+            <div className="relative z-10 pt-8 flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm text-slate-200">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brand-emerald" />
+                <span className="font-semibold">RC & Insurance Verified</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-brand-emerald" />
+                <span className="font-semibold">15-Min Guaranteed Hold</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-brand-emerald" />
+                <span className="font-semibold">Self-Drive & Chauffeur Modes</span>
+              </div>
+            </div>
           </div>
 
-          {/* Unified Search Box */}
-          <div className="mt-10 bg-white rounded-3xl p-4 sm:p-6 shadow-2xl border border-slate-100 text-slate-900 max-w-5xl">
-            <form onSubmit={handleHeroSearch} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Location */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                    Pickup Location
-                  </label>
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
+          {/* Floating Pill Search Bar Widget (Intersecting Banner) */}
+          <div className="relative z-20 -mt-10 sm:-mt-12 max-w-5xl mx-auto px-2">
+            <div className="bg-white rounded-2xl sm:rounded-full p-2.5 sm:p-3 shadow-floating border border-brand-border">
+              <form onSubmit={handleHeroSearch} className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+                {/* Location Input Segment */}
+                <div className="flex-1 w-full sm:w-auto flex items-center gap-2.5 px-4 py-2.5 bg-brand-surface rounded-xl sm:rounded-full border border-brand-border/60 hover:border-brand-emerald transition-colors">
+                  <MapPin className="w-4 h-4 text-brand-emerald shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-[10px] uppercase font-bold text-brand-text-muted leading-tight">
+                      Where
+                    </label>
                     <select
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      aria-label="Select pickup city"
+                      className="w-full bg-transparent text-xs font-bold text-brand-navy focus:outline-none cursor-pointer truncate"
                     >
                       <option value="Indiranagar, Bengaluru">Indiranagar, Bengaluru</option>
                       <option value="Koramangala, Bengaluru">Koramangala, Bengaluru</option>
                       <option value="HSR Layout, Bengaluru">HSR Layout, Bengaluru</option>
                       <option value="Whitefield, Bengaluru">Whitefield, Bengaluru</option>
+                      <option value="Connaught Place, Delhi">Connaught Place, Delhi</option>
+                      <option value="Cyber City, Gurugram">Cyber City, Gurugram</option>
+                      <option value="Bandra West, Mumbai">Bandra West, Mumbai</option>
+                      <option value="Panjim, Goa">Panjim, Goa</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Category */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                    Vehicle Category
-                  </label>
-                  <div className="relative">
-                    <Car className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                {/* Category Segment */}
+                <div className="w-full sm:w-48 flex items-center gap-2.5 px-4 py-2.5 bg-brand-surface rounded-xl sm:rounded-full border border-brand-border/60 hover:border-brand-emerald transition-colors">
+                  <Car className="w-4 h-4 text-brand-emerald shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-[10px] uppercase font-bold text-brand-text-muted leading-tight">
+                      Vehicle Type
+                    </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as VehicleCategory | 'all')}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      aria-label="Select vehicle category"
+                      className="w-full bg-transparent text-xs font-bold text-brand-navy focus:outline-none cursor-pointer"
                     >
-                      <option value="all">All Vehicles (Cars & Bikes)</option>
+                      <option value="all">All Fleet</option>
                       <option value="car">Cars Only</option>
                       <option value="bike">Motorcycles</option>
-                      <option value="scooter">Automatic Scooters</option>
+                      <option value="scooter">Scooters</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Rental Type */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                    Rental Mode
-                  </label>
-                  <div className="relative">
-                    <Users className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                {/* Rental Mode Segment */}
+                <div className="w-full sm:w-48 flex items-center gap-2.5 px-4 py-2.5 bg-brand-surface rounded-xl sm:rounded-full border border-brand-border/60 hover:border-brand-emerald transition-colors">
+                  <Users className="w-4 h-4 text-brand-emerald shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-[10px] uppercase font-bold text-brand-text-muted leading-tight">
+                      Rental Mode
+                    </label>
                     <select
                       value={rentalType}
                       onChange={(e) => setRentalType(e.target.value as RentalType | 'all')}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      aria-label="Select rental mode"
+                      className="w-full bg-transparent text-xs font-bold text-brand-navy focus:outline-none cursor-pointer"
                     >
-                      <option value="all">Self-Drive & With Driver</option>
-                      <option value="self-drive">Self-Drive Only</option>
-                      <option value="with-driver">With Chauffeur / Driver</option>
+                      <option value="all">Any Mode</option>
+                      <option value="self-drive">Self-Drive</option>
+                      <option value="with-driver">With Chauffeur</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Submit button */}
-                <div className="flex items-end">
-                  <button
-                    type="submit"
-                    className="w-full py-3 px-6 rounded-xl font-bold text-xs sm:text-sm bg-slate-900 text-white hover:bg-emerald-600 transition-colors shadow-lg flex items-center justify-center gap-2 group"
-                  >
-                    <Search className="w-4 h-4 text-emerald-400 group-hover:text-white" />
-                    Explore Available Fleet
-                  </button>
-                </div>
-              </div>
-            </form>
+                {/* Search Button */}
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto h-12 px-7 rounded-xl sm:rounded-full bg-brand-navy hover:bg-brand-emerald text-white font-bold text-sm flex items-center justify-center gap-2 shadow-floating transition-all duration-300 group shrink-0"
+                >
+                  <Search className="w-4 h-4 text-brand-emerald group-hover:text-white transition-colors" />
+                  <span>Search Fleet</span>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Grid */}
+      {/* Curated Categories */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              Browse by Category
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-emerald">
+              Curated Mobility
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-display font-extrabold text-brand-navy mt-1">
+              Find the right ride for every journey
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Choose from verified hatchbacks, sedans, SUVs, cruisers, or city scooters.
+            <p className="text-sm text-brand-text-muted mt-1">
+              Hand-picked verified inventory from top-rated local hosts and fleet managers.
             </p>
           </div>
           <Link
             href="/explore"
-            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+            className="text-xs font-bold text-brand-navy hover:text-brand-emerald flex items-center gap-1 transition-colors"
           >
             View all categories <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Cars Card */}
           <Link
             href="/explore?category=car"
-            className="group relative bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between"
+            className="group relative bg-white rounded-3xl p-7 border border-brand-border shadow-card hover:shadow-card-hover hover:border-brand-emerald transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-brand-navy text-brand-emerald flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Car className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                Cars & SUVs
+              <h3 className="text-xl font-display font-bold text-brand-navy group-hover:text-brand-emerald transition-colors">
+                Cars & Premium SUVs
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Hyundai i20, Maruti Baleno, Tata Nexon, Honda City & more. Available in manual and
-                automatic transmissions.
+              <p className="text-xs text-brand-text-muted mt-2 leading-relaxed">
+                Hatchbacks, sedans, and luxury compact SUVs. Equipped with ABS, airbags, and verified digital RCs.
               </p>
             </div>
-            <div className="mt-6 flex items-center justify-between text-xs font-semibold text-slate-700 pt-4 border-t border-slate-100">
-              <span>From ₹1,650/day</span>
-              <span className="text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                Explore Cars &rarr;
+            <div className="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs font-bold">
+              <span className="text-brand-navy">Starting ₹1,650/day</span>
+              <span className="text-brand-emerald flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Cars <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </Link>
 
+          {/* Bikes Card */}
           <Link
             href="/explore?category=bike"
-            className="group relative bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between"
+            className="group relative bg-white rounded-3xl p-7 border border-brand-border shadow-card hover:shadow-card-hover hover:border-brand-emerald transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-brand-surface text-brand-navy flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Bike className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
-                Motorcycles
+              <h3 className="text-xl font-display font-bold text-brand-navy group-hover:text-brand-emerald transition-colors">
+                Cruisers & Motorcycles
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Royal Enfield Classic 350, Yamaha FZ-S & agile roadsters. Complete with dual ISI
-                helmets for highway trips.
+              <p className="text-xs text-brand-text-muted mt-2 leading-relaxed">
+                Royal Enfield Classic 350, Yamaha MT & sports roadsters with dual ISI-certified helmets included.
               </p>
             </div>
-            <div className="mt-6 flex items-center justify-between text-xs font-semibold text-slate-700 pt-4 border-t border-slate-100">
-              <span>From ₹750/day</span>
-              <span className="text-amber-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                Explore Bikes &rarr;
+            <div className="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs font-bold">
+              <span className="text-brand-navy">Starting ₹750/day</span>
+              <span className="text-brand-emerald flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Bikes <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </Link>
 
+          {/* Scooters Card */}
           <Link
             href="/explore?category=scooter"
-            className="group relative bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between"
+            className="group relative bg-white rounded-3xl p-7 border border-brand-border shadow-card hover:shadow-card-hover hover:border-brand-emerald transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-brand-emerald-subtle text-brand-emerald flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Zap className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                Automatic Scooters
+              <h3 className="text-xl font-display font-bold text-brand-navy group-hover:text-brand-emerald transition-colors">
+                City Scooters & Electric
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Honda Activa 6G, TVS Jupiter 125. Zippy, economical, and hassle-free for daily urban
-                commuting.
+              <p className="text-xs text-brand-text-muted mt-2 leading-relaxed">
+                Honda Activa, TVS Jupiter & smart electric scooters for effortless, budget-friendly urban travel.
               </p>
             </div>
-            <div className="mt-6 flex items-center justify-between text-xs font-semibold text-slate-700 pt-4 border-t border-slate-100">
-              <span>From ₹500/day</span>
-              <span className="text-emerald-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                Explore Scooters &rarr;
+            <div className="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs font-bold">
+              <span className="text-brand-navy">Starting ₹500/day</span>
+              <span className="text-brand-emerald flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Scooters <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* Featured Vehicles Section */}
+      {/* Featured Vehicles Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-emerald uppercase tracking-wider mb-1">
               <Award className="w-4 h-4" />
-              <span>Verified Host Listings</span>
+              <span>Available Right Now</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            <h2 className="text-2xl sm:text-4xl font-display font-extrabold text-brand-navy">
               Featured Rides Near You
             </h2>
           </div>
           <Link
             href="/explore"
-            className="px-4 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors text-slate-800"
+            className="px-4 py-2 text-xs font-bold bg-brand-surface hover:bg-slate-200/70 border border-brand-border rounded-xl transition-all text-brand-navy"
           >
             Browse Full Catalogue ({approvedVehicles.length})
           </Link>
@@ -268,49 +311,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How VahanLoop Works */}
-      <section className="bg-slate-100/70 border-y border-slate-200/80 py-16 px-4 sm:px-6 lg:px-8">
+      {/* 3-Step Trust Experience */}
+      <section className="bg-white border-y border-brand-border py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              How VahanLoop Works
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-emerald">
+              Streamlined Process
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-display font-extrabold text-brand-navy mt-1">
+              How VahanLoop works
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-2">
-              Simple 3-step rental experience designed for trust, convenience, and transparency.
+            <p className="text-sm text-brand-text-muted mt-2">
+              Simple 3-step rental experience built with zero paper bureaucracy and maximum security.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-white font-extrabold flex items-center justify-center text-sm mb-4">
+            <div className="bg-brand-surface rounded-3xl p-8 border border-brand-border shadow-card relative hover:border-brand-emerald transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand-navy text-white font-display font-extrabold flex items-center justify-center text-base mb-6">
                 01
               </div>
-              <h3 className="text-base font-bold text-slate-900">Search & Customise</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              <h3 className="text-lg font-display font-bold text-brand-navy">Choose & Customise</h3>
+              <p className="text-xs text-brand-text-muted mt-2.5 leading-relaxed">
                 Filter by car, bike or scooter, self-drive or with-driver, fuel type, transmission,
-                and price. View high-resolution photos and authentic specifications.
+                and price. View transparent price quotes with security deposit breakdown.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm mb-4">
+            <div className="bg-brand-surface rounded-3xl p-8 border border-brand-border shadow-card relative hover:border-brand-emerald transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand-emerald text-white font-display font-extrabold flex items-center justify-center text-base mb-6">
                 02
               </div>
-              <h3 className="text-base font-bold text-slate-900">Request & Confirm</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                Choose dates and send your booking request. Once the vehicle partner accepts,
-                simulate payment through UPI or NetBanking to lock in the reservation.
+              <h3 className="text-lg font-display font-bold text-brand-navy">Request & Hold</h3>
+              <p className="text-xs text-brand-text-muted mt-2.5 leading-relaxed">
+                Host receives your request and accepts. The vehicle is automatically reserved on a 15-minute
+                exclusive hold while you complete your test checkout.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative">
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-white font-extrabold flex items-center justify-center text-sm mb-4">
+            <div className="bg-brand-surface rounded-3xl p-8 border border-brand-border shadow-card relative hover:border-brand-emerald transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-brand-navy text-white font-display font-extrabold flex items-center justify-center text-base mb-6">
                 03
               </div>
-              <h3 className="text-base font-bold text-slate-900">Pick Up & Enjoy</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                Meet the verified partner at the pickup point, complete a swift digital checklist,
-                and hit the open road with 24/7 road assistance.
+              <h3 className="text-lg font-display font-bold text-brand-navy">Inspect & Hit the Road</h3>
+              <p className="text-xs text-brand-text-muted mt-2.5 leading-relaxed">
+                Meet your host at pickup, complete the quick digital condition inspection checklist,
+                and enjoy complete peace of mind with 24/7 roadside assistance.
               </p>
             </div>
           </div>
@@ -319,35 +365,35 @@ export default function HomePage() {
 
       {/* Become an Owner CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-2xl">
+        <div className="bg-brand-navy rounded-3xl sm:rounded-[2.5rem] p-8 sm:p-14 text-white relative overflow-hidden shadow-floating border border-brand-navy-light/40">
           <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-brand-emerald/20 text-brand-emerald-accent border border-brand-emerald/30 mb-5">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>Monetise Your Underutilised Vehicle</span>
+              <span>Monetise Your Underutilised Asset</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
-              Turn your vehicle into a monthly earning asset.
+            <h2 className="text-3xl sm:text-5xl font-display font-extrabold tracking-tight leading-tight">
+              Turn your vehicle into a monthly earning powerhouse.
             </h2>
 
-            <p className="mt-3 text-sm text-slate-300 leading-relaxed">
-              Cars and bikes sit parked for an average of 90% of their life. Register your vehicle
-              on VahanLoop, set your own daily rates, and earn up to ₹35,000/month securely.
+            <p className="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+              Private cars and bikes sit idle for over 90% of their lifespan. List your vehicle on VahanLoop,
+              retain full control over rental dates and pricing, and earn up to ₹35,000/month securely.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/owner/add-vehicle"
-                className="px-6 py-3 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition-colors shadow-lg flex items-center gap-2"
+                className="px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm bg-brand-emerald hover:bg-brand-emerald-dark text-white transition-all shadow-floating flex items-center gap-2"
               >
-                Register Vehicle Now
+                Register Your Vehicle Now
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/owner"
-                className="px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                className="px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all backdrop-blur-md"
               >
-                Explore Partner Portal
+                Explore Host Portal
               </Link>
             </div>
           </div>

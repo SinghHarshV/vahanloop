@@ -14,6 +14,9 @@ import {
   CreditCard,
   FileCheck2,
   Sparkles,
+  MapPin,
+  ShieldCheck,
+  ChevronRight,
 } from 'lucide-react';
 
 interface BookingCardProps {
@@ -28,37 +31,37 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
     switch (status) {
       case 'confirmed':
         return {
-          bg: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+          bg: 'bg-brand-emerald-subtle text-brand-emerald border-brand-emerald/30',
           icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-          label: 'Confirmed Reservation',
+          label: 'Confirmed Booking',
         };
       case 'awaiting_payment':
         return {
-          bg: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+          bg: 'bg-blue-500/10 text-blue-700 border-blue-500/30 animate-pulse',
           icon: <CreditCard className="w-3.5 h-3.5" />,
-          label: 'Accepted – Awaiting Payment',
+          label: 'Accepted · Ready for Payment',
         };
       case 'requested':
         return {
-          bg: 'bg-amber-100 text-amber-800 border-amber-300',
+          bg: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
           icon: <Clock className="w-3.5 h-3.5" />,
-          label: 'Requested – Awaiting Partner',
+          label: 'Requested · Awaiting Host',
         };
       case 'rejected':
         return {
-          bg: 'bg-rose-100 text-rose-800 border-rose-300',
+          bg: 'bg-brand-danger/10 text-brand-danger border-brand-danger/30',
           icon: <XCircle className="w-3.5 h-3.5" />,
-          label: 'Partner Declined',
+          label: 'Host Declined',
         };
       case 'cancelled':
         return {
-          bg: 'bg-slate-100 text-slate-700 border-slate-300',
+          bg: 'bg-slate-100 text-brand-text-muted border-brand-border',
           icon: <AlertCircle className="w-3.5 h-3.5" />,
           label: 'Cancelled',
         };
       case 'completed':
         return {
-          bg: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+          bg: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
           icon: <FileCheck2 className="w-3.5 h-3.5" />,
           label: 'Completed Trip',
         };
@@ -68,105 +71,94 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
   const badge = getStatusBadge(booking.status);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 hover:shadow-md transition-shadow">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+    <div className="bg-white rounded-3xl border border-brand-border shadow-card hover:shadow-card-hover transition-all duration-300 p-6 space-y-5">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-brand-border pb-4">
         <div>
-          <span className="text-[11px] font-mono text-slate-400">ID: {booking.id}</span>
-          <h3 className="text-base font-bold text-slate-900 mt-0.5">{booking.vehicleTitle}</h3>
+          <span className="text-[10px] font-mono uppercase font-bold text-brand-text-muted">
+            Reservation #{booking.id}
+          </span>
+          <h3 className="text-lg font-display font-bold text-brand-navy mt-0.5">
+            {booking.vehicleTitle}
+          </h3>
         </div>
 
         <span
           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
         >
           {badge.icon}
-          {badge.label}
+          <span>{badge.label}</span>
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-        {/* Thumbnail */}
-        <div className="w-full md:w-36 h-24 rounded-xl overflow-hidden bg-slate-100 relative shrink-0">
-          {booking.vehicleImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={booking.vehicleImage}
-              alt={booking.vehicleTitle}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400">
-              <Car className="w-8 h-8" />
-            </div>
-          )}
-        </div>
-
-        {/* Schedule & Mode */}
-        <div className="space-y-1.5 text-xs text-slate-600 md:col-span-2">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="font-semibold text-slate-800">
-              {booking.startDate} &rarr; {booking.endDate} ({booking.totalDays}{' '}
-              {booking.totalDays === 1 ? 'day' : 'days'})
+      {/* Middle Specs & Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+        <div className="p-3 bg-brand-surface rounded-2xl border border-brand-border/60">
+          <p className="text-[10px] font-bold uppercase text-brand-text-muted">Trip Dates</p>
+          <div className="flex items-center gap-1.5 font-bold text-brand-navy mt-1">
+            <Calendar className="w-3.5 h-3.5 text-brand-emerald" />
+            <span>
+              {booking.startDate} &rarr; {booking.endDate}
             </span>
           </div>
-
-          <p className="capitalize">
-            <strong className="text-slate-700">Mode:</strong>{' '}
-            {booking.rentalType.replace('-', ' ')}
-            {booking.driverChargeTotal > 0 && ' (With Professional Chauffeur)'}
+          <p className="text-[10px] text-brand-text-muted mt-0.5">
+            {booking.totalDays} {booking.totalDays === 1 ? 'day' : 'days'} duration
           </p>
-
-          <p className="text-[11px] text-slate-400">
-            Requested on {new Date(booking.createdAt).toLocaleDateString()}
-          </p>
-
-          {booking.rejectionReason && (
-            <p className="text-rose-600 text-xs bg-rose-50 p-2 rounded-lg border border-rose-200 mt-1">
-              <strong>Decline Reason:</strong> {booking.rejectionReason}
-            </p>
-          )}
-
-          {booking.paymentSimulated && (
-            <div className="bg-emerald-50 border border-emerald-200/80 p-2 rounded-lg text-[11px] text-emerald-800 flex items-center gap-2 mt-2">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>
-                <strong>Simulated Receipt:</strong> {booking.paymentSimulated.transactionId} via{' '}
-                {booking.paymentSimulated.method}
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Price & Action */}
-        <div className="flex flex-col justify-between items-start md:items-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
-          <div className="text-left md:text-right">
-            <p className="text-xs text-slate-400">Total Simulation Price</p>
-            <p className="text-lg font-black text-slate-900">
-              ₹{booking.totalAmount.toLocaleString('en-IN')}
-            </p>
-            <p className="text-[10px] text-slate-400">Incl. ₹{booking.securityDeposit} deposit</p>
-          </div>
+        <div className="p-3 bg-brand-surface rounded-2xl border border-brand-border/60">
+          <p className="text-[10px] font-bold uppercase text-brand-text-muted">Rental Mode</p>
+          <p className="font-bold text-brand-navy capitalize mt-1 text-sm">
+            {booking.rentalType.replace('-', ' ')}
+          </p>
+          <p className="text-[10px] text-brand-text-muted mt-0.5">Category: {booking.vehicleCategory}</p>
+        </div>
 
-          <div className="mt-3 flex gap-2">
-            {booking.status === 'awaiting_payment' && (
-              <button
-                onClick={() => setShowPaymentModal(true)}
-                className="px-4 py-2 text-xs font-bold bg-emerald-600 text-white rounded-xl shadow-md hover:bg-emerald-700 transition-colors flex items-center gap-1.5"
-              >
-                <CreditCard className="w-3.5 h-3.5" />
-                Simulate Payment
-              </button>
-            )}
+        <div className="p-3 bg-brand-surface rounded-2xl border border-brand-border/60">
+          <p className="text-[10px] font-bold uppercase text-brand-text-muted">Total Amount</p>
+          <p className="font-display font-extrabold text-brand-navy text-base mt-1">
+            ₹{booking.totalAmount.toLocaleString('en-IN')}
+          </p>
+          <p className="text-[10px] text-brand-text-muted mt-0.5">Incl. deposit & platform fees</p>
+        </div>
 
-            {(booking.status === 'requested' || booking.status === 'awaiting_payment') && (
-              <button
-                onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-                className="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-              >
-                Cancel Request
-              </button>
-            )}
-          </div>
+        <div className="p-3 bg-brand-surface rounded-2xl border border-brand-border/60">
+          <p className="text-[10px] font-bold uppercase text-brand-text-muted">Payment Status</p>
+          <p className="font-bold text-brand-navy capitalize mt-1 text-sm">
+            {booking.paymentSimulated ? 'Paid (Sandbox)' : 'Pending'}
+          </p>
+          <p className="text-[10px] text-brand-text-muted mt-0.5">
+            {booking.paymentSimulated?.method || 'Not yet processed'}
+          </p>
+        </div>
+      </div>
+
+      {/* Action Strip */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs text-brand-text-muted">
+          <ShieldCheck className="w-4 h-4 text-brand-emerald" />
+          <span>Vehicle host: {booking.customerEmail ? 'Verified Partner' : 'Direct Host'}</span>
+        </div>
+
+        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+          {booking.status === 'awaiting_payment' && (
+            <button
+              onClick={() => setShowPaymentModal(true)}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold bg-brand-emerald hover:bg-brand-emerald-dark text-white shadow-floating flex items-center justify-center gap-1.5 transition-all"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              Complete Test Payment
+            </button>
+          )}
+
+          {booking.status === 'requested' && (
+            <button
+              onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+              className="px-4 py-2 rounded-full text-xs font-semibold text-brand-danger bg-brand-danger/10 hover:bg-brand-danger/20 transition-colors"
+            >
+              Cancel Request
+            </button>
+          )}
         </div>
       </div>
 
@@ -174,7 +166,9 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         <PaymentModal
           booking={booking}
           onClose={() => setShowPaymentModal(false)}
-          onSuccess={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            setShowPaymentModal(false);
+          }}
         />
       )}
     </div>

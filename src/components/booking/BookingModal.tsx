@@ -15,6 +15,7 @@ import {
   X,
   Clock,
   Sparkles,
+  Lock,
 } from 'lucide-react';
 
 interface BookingModalProps {
@@ -122,199 +123,159 @@ export const BookingModal: React.FC<BookingModalProps> = ({ vehicle, onClose }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-200 shadow-2xl p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-navy/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar border border-brand-border shadow-floating p-7 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100"
+          className="absolute top-5 right-5 text-brand-text-muted hover:text-brand-navy p-1.5 rounded-full hover:bg-brand-surface transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2 mb-1 text-emerald-600 font-semibold text-xs tracking-wider uppercase">
+        <div className="flex items-center gap-2 mb-1.5 text-brand-emerald font-bold text-xs tracking-wider uppercase">
           <Sparkles className="w-4 h-4" />
-          <span>Demonstration Booking Workflow</span>
+          <span>Direct Host Reservation</span>
         </div>
 
-        <h2 className="text-xl font-bold text-slate-900">Request Vehicle Reservation</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <h2 className="text-2xl font-display font-extrabold text-brand-navy">Request Reservation</h2>
+        <p className="text-xs text-brand-text-muted mt-0.5">
           {vehicle.title} · {vehicle.location}
         </p>
 
         {errorMessage && (
-          <div className="mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+          <div className="mt-4 p-3.5 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-brand-danger text-xs flex items-start gap-2.5">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           {/* Rental Mode Selection */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Choose Rental Mode
+            <label className="block text-[11px] font-bold text-brand-navy uppercase tracking-wider mb-2">
+              Rental Mode
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => setRentalType('self-drive')}
                 disabled={!vehicle.supportedModes.includes('self-drive')}
-                className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                className={`py-2.5 px-3 rounded-2xl text-xs font-bold border transition-all text-center ${
                   rentalType === 'self-drive'
-                    ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20'
-                    : 'border-slate-200 hover:bg-slate-50'
+                    ? 'border-brand-navy bg-brand-navy text-white shadow-sm'
+                    : 'border-brand-border bg-brand-surface text-brand-text-muted hover:text-brand-navy'
                 } ${!vehicle.supportedModes.includes('self-drive') ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">Self-Drive</span>
-                  <span className="text-[10px] text-emerald-700 font-semibold">Standard</span>
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1">Drive yourself freely</p>
+                Self-Drive Mode
               </button>
-
               <button
                 type="button"
                 onClick={() => setRentalType('with-driver')}
                 disabled={!vehicle.supportedModes.includes('with-driver')}
-                className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                className={`py-2.5 px-3 rounded-2xl text-xs font-bold border transition-all text-center ${
                   rentalType === 'with-driver'
-                    ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20'
-                    : 'border-slate-200 hover:bg-slate-50'
+                    ? 'border-brand-navy bg-brand-navy text-white shadow-sm'
+                    : 'border-brand-border bg-brand-surface text-brand-text-muted hover:text-brand-navy'
                 } ${!vehicle.supportedModes.includes('with-driver') ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">With Chauffeur</span>
-                  <span className="text-[10px] text-blue-700 font-semibold">
-                    +₹{vehicle.driverChargePerDay || 700}/day
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1">Verified partner driver</p>
+                With Chauffeur
               </button>
             </div>
           </div>
 
-          {/* Date Range Selection */}
+          {/* Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-bold text-brand-navy uppercase tracking-wider mb-1.5">
                 Pickup Date
               </label>
               <input
                 type="date"
-                required
                 value={startDate}
                 min={formatDate(new Date())}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                required
+                className="w-full px-3 py-2 text-xs font-semibold rounded-2xl border border-brand-border bg-brand-surface text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-emerald"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-bold text-brand-navy uppercase tracking-wider mb-1.5">
                 Return Date
               </label>
               <input
                 type="date"
-                required
                 value={endDate}
                 min={startDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                required
+                className="w-full px-3 py-2 text-xs font-semibold rounded-2xl border border-brand-border bg-brand-surface text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-emerald"
               />
             </div>
           </div>
 
-          <div className="text-xs text-slate-500 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-            <span className="flex items-center gap-1.5 font-medium text-slate-700">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              Duration: {totalDays} {totalDays === 1 ? 'day' : 'days'}
-            </span>
-            <span className="text-slate-400">
-              Min duration: {vehicle.minimumDurationDays} {vehicle.minimumDurationDays === 1 ? 'day' : 'days'}
-            </span>
-          </div>
-
-          {/* Price Breakdown Card */}
-          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/80 space-y-2 text-xs">
-            <div className="flex items-center justify-between font-bold text-slate-800 text-[13px] border-b border-slate-200 pb-2">
-              <span>Price Breakdown</span>
-              <span className="text-[10px] text-slate-500 font-normal">Simulated Demo Rates</span>
-            </div>
-
-            <div className="flex justify-between text-slate-600">
+          {/* Pricing Summary Card */}
+          <div className="bg-brand-surface rounded-2xl p-4 border border-brand-border space-y-2 text-xs">
+            <div className="flex justify-between text-brand-text-muted">
               <span>
-                Daily Rental (₹{vehicle.dailyRate} × {totalDays} days)
+                Base Rate (₹{vehicle.dailyRate.toLocaleString('en-IN')} × {totalDays} {totalDays === 1 ? 'day' : 'days'})
               </span>
-              <span className="font-semibold text-slate-800">
-                ₹{dailyRateTotal.toLocaleString('en-IN')}
-              </span>
+              <span className="font-semibold text-brand-navy">₹{dailyRateTotal.toLocaleString('en-IN')}</span>
             </div>
 
             {rentalType === 'with-driver' && (
-              <div className="flex justify-between text-slate-600">
-                <span>
-                  Chauffeur Service (₹{driverChargeDaily} × {totalDays} days)
-                </span>
-                <span className="font-semibold text-blue-700">
-                  ₹{driverChargeTotal.toLocaleString('en-IN')}
-                </span>
+              <div className="flex justify-between text-brand-text-muted">
+                <span>Chauffeur Service (₹{driverChargeDaily} × {totalDays} days)</span>
+                <span className="font-semibold text-brand-navy">₹{driverChargeTotal.toLocaleString('en-IN')}</span>
               </div>
             )}
 
-            <div className="flex justify-between text-slate-600">
+            <div className="flex justify-between text-brand-text-muted">
               <span>Platform Service Fee ({PRICING_CONFIG.platformServiceFeePercent}%)</span>
-              <span className="font-semibold text-slate-800">
-                ₹{serviceFee.toLocaleString('en-IN')}
-              </span>
+              <span className="font-semibold text-brand-navy">₹{serviceFee.toLocaleString('en-IN')}</span>
             </div>
 
-            <div className="flex justify-between text-slate-600">
-              <span className="flex items-center gap-1">
-                Refundable Security Deposit
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1 rounded">
-                  Refunded post-trip
-                </span>
-              </span>
-              <span className="font-semibold text-slate-800">
-                ₹{securityDeposit.toLocaleString('en-IN')}
-              </span>
+            <div className="flex justify-between text-brand-text-muted">
+              <span>Refundable Security Deposit</span>
+              <span className="font-semibold text-brand-navy">₹{securityDeposit.toLocaleString('en-IN')}</span>
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-slate-200 text-sm font-extrabold text-slate-900">
-              <span>Estimated Grand Total</span>
-              <span className="text-emerald-700 text-base">
+            <div className="pt-2 border-t border-brand-border flex justify-between items-baseline font-bold text-brand-navy">
+              <span className="text-sm font-display">Total Estimated Quotation</span>
+              <span className="text-xl font-display font-black text-brand-navy">
                 ₹{totalAmount.toLocaleString('en-IN')}
               </span>
             </div>
           </div>
 
-          {/* Demo Identity Notice */}
-          <div className="text-[11px] text-slate-500 bg-amber-50/70 border border-amber-200/60 p-2.5 rounded-xl flex items-start gap-2">
-            <UserCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              Booking will be submitted under customer:{' '}
-              <strong className="text-slate-800">{currentUser?.name || 'Customer'}</strong> (
-              {currentUser?.email || 'customer@vahanloop.demo'}). You can switch roles to review it as the Owner.
-            </div>
+          {/* Host Notes */}
+          <div>
+            <label className="block text-[11px] font-bold text-brand-navy uppercase tracking-wider mb-1.5">
+              Trip Notes (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Destination, preferred pickup timing, or special requests..."
+              className="w-full p-3 text-xs rounded-2xl border border-brand-border bg-brand-surface text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-emerald"
+            />
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition-colors flex items-center gap-1.5"
-            >
-              {isSubmitting ? 'Submitting Request...' : 'Send Booking Request'}
-            </button>
-          </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3.5 px-6 rounded-full font-bold text-sm bg-brand-navy hover:bg-brand-emerald text-white transition-all shadow-floating flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <span>Submitting Request...</span>
+            ) : (
+              <>
+                <CreditCard className="w-4 h-4 text-brand-emerald" />
+                <span>Submit Reservation Request</span>
+              </>
+            )}
+          </button>
         </form>
       </div>
     </div>

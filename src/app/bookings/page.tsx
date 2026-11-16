@@ -6,7 +6,7 @@ import { useMarketplace } from '@/context/MarketplaceContext';
 import { useAuth } from '@/context/AuthContext';
 import { BookingCard } from '@/components/booking/BookingCard';
 import { BookingStatus } from '@/types';
-import { CalendarCheck, Car, Compass, Clock, CheckCircle2 } from 'lucide-react';
+import { CalendarCheck, Car, Compass, Clock, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function BookingsPage() {
   const { bookings } = useMarketplace();
@@ -34,38 +34,39 @@ export default function BookingsPage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-brand-border">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-brand-emerald uppercase tracking-wider mb-1.5">
             <CalendarCheck className="w-4 h-4" />
-            <span>Reservation Tracker</span>
+            <span>Trip Management</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            My Vehicle Bookings
+          <h1 className="text-3xl font-display font-extrabold text-brand-navy">
+            My Vehicle Reservations
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Logged in as <strong className="text-slate-800">{currentUser?.name || 'Guest'}</strong> ({currentUser?.email || 'Not logged in'})
+          <p className="text-xs sm:text-sm text-brand-text-muted mt-1">
+            Logged in as <strong className="text-brand-navy font-bold">{currentUser?.name || 'Guest'}</strong> ({currentUser?.email || 'Not logged in'})
           </p>
         </div>
 
         <Link
           href="/explore"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-emerald-600 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-brand-navy hover:bg-brand-emerald text-white transition-all shadow-floating"
         >
           <Compass className="w-4 h-4" />
-          Browse More Vehicles
+          Explore Fleet
         </Link>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 pb-2 text-xs font-semibold">
+      <div className="flex gap-2 border-b border-brand-border pb-3 text-xs font-bold">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-3.5 py-1.5 rounded-lg transition-colors ${
+          className={`px-4 py-2 rounded-full transition-all ${
             activeTab === 'all'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-brand-navy text-white shadow-sm'
+              : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
           }`}
         >
           All Reservations ({customerBookings.length})
@@ -73,47 +74,68 @@ export default function BookingsPage() {
 
         <button
           onClick={() => setActiveTab('active')}
-          className={`px-3.5 py-1.5 rounded-lg transition-colors ${
+          className={`px-4 py-2 rounded-full transition-all ${
             activeTab === 'active'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-brand-navy text-white shadow-sm'
+              : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
           }`}
         >
-          Active / Upcoming
+          Active / Pending (
+          {
+            customerBookings.filter(
+              (b) =>
+                b.status === 'requested' ||
+                b.status === 'awaiting_payment' ||
+                b.status === 'confirmed'
+            ).length
+          }
+          )
         </button>
 
         <button
           onClick={() => setActiveTab('completed')}
-          className={`px-3.5 py-1.5 rounded-lg transition-colors ${
+          className={`px-4 py-2 rounded-full transition-all ${
             activeTab === 'completed'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-brand-navy text-white shadow-sm'
+              : 'text-brand-text-muted hover:text-brand-navy hover:bg-brand-surface'
           }`}
         >
-          Past & Cancelled
+          Completed / Past (
+          {
+            customerBookings.filter(
+              (b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'rejected'
+            ).length
+          }
+          )
         </button>
       </div>
 
       {/* List */}
-      <div className="space-y-4">
-        {filtered.length > 0 ? (
-          filtered.map((booking) => <BookingCard key={booking.id} booking={booking} />)
-        ) : (
-          <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4">
-            <Car className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-base font-bold text-slate-800">No bookings in this category</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Ready for your next journey? Browse verified cars and bikes on VahanLoop.
-            </p>
-            <Link
-              href="/explore"
-              className="inline-block px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-emerald-600 transition-colors"
-            >
-              Explore Fleet
-            </Link>
+      {filtered.length > 0 ? (
+        <div className="space-y-5">
+          {filtered.map((booking) => (
+            <BookingCard key={booking.id} booking={booking} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-3xl border border-brand-border p-12 text-center shadow-card space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-brand-surface flex items-center justify-center mx-auto text-brand-text-muted">
+            <Car className="w-8 h-8 stroke-[1.5]" />
           </div>
-        )}
-      </div>
+          <h3 className="text-lg font-display font-bold text-brand-navy">No reservations found</h3>
+          <p className="text-xs text-brand-text-muted max-w-sm mx-auto">
+            {activeTab === 'all'
+              ? "You haven't made any vehicle bookings yet. Explore our verified fleet to get started."
+              : `You have no ${activeTab} reservations at the moment.`}
+          </p>
+          <Link
+            href="/explore"
+            className="inline-block mt-2 px-6 py-2.5 rounded-full text-xs font-bold bg-brand-navy hover:bg-brand-emerald text-white transition-colors"
+          >
+            Find a Vehicle
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

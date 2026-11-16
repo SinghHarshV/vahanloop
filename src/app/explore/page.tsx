@@ -6,7 +6,7 @@ import { useMarketplace } from '@/context/MarketplaceContext';
 import { VehicleCard } from '@/components/vehicles/VehicleCard';
 import { VehicleFilter } from '@/components/vehicles/VehicleFilter';
 import { FilterState, VehicleCategory, RentalType, FuelType, Transmission } from '@/types';
-import { SlidersHorizontal, ArrowUpDown, Car, SearchX } from 'lucide-react';
+import { SlidersHorizontal, ArrowUpDown, Car, SearchX, MapPin, Sparkles, Filter } from 'lucide-react';
 
 function ExploreContent() {
   const searchParams = useSearchParams();
@@ -82,7 +82,7 @@ function ExploreContent() {
         // Transmission
         if (filters.transmission !== 'all' && v.transmission !== filters.transmission) return false;
 
-        // Max price
+        // Price range
         if (v.dailyRate > filters.maxPrice) return false;
 
         return true;
@@ -91,60 +91,77 @@ function ExploreContent() {
         if (filters.sortBy === 'price_low') return a.dailyRate - b.dailyRate;
         if (filters.sortBy === 'price_high') return b.dailyRate - a.dailyRate;
         if (filters.sortBy === 'rating') return b.ownerRating - a.ownerRating;
-        return 0; // recommended
+        return 0; // recommended default order
       });
   }, [approvedVehicles, filters]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Search Header Banner */}
+      <div className="bg-brand-navy rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-premium border border-brand-navy-light/40">
+        <div className="relative z-10 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20 mb-3 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-brand-emerald" />
+            <span>Verified Fleet Inventory</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-display font-extrabold tracking-tight">
             Explore Available Vehicles
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Showing <strong className="text-slate-800">{filteredVehicles.length}</strong> verified{' '}
-            {filteredVehicles.length === 1 ? 'vehicle' : 'vehicles'} ready for immediate booking.
+          <p className="mt-2 text-xs sm:text-sm text-slate-300">
+            Compare hatchbacks, luxury sedans, adventure bikes and city scooters with instant live quotation.
           </p>
         </div>
+      </div>
 
-        {/* Sort & Mobile Filter Toggle */}
-        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+      {/* Top Controls Bar */}
+      <div className="bg-white rounded-2xl p-4 border border-brand-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2 text-xs text-brand-text-muted">
+          <span className="font-bold text-brand-navy text-sm">{filteredVehicles.length}</span>
+          <span>vehicles matching your search criteria</span>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          {/* Mobile Filter Toggle */}
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="md:hidden flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white border border-slate-200 rounded-xl shadow-sm text-slate-700"
+            className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-brand-surface border border-brand-border text-brand-navy hover:bg-slate-200/60"
           >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            Filters {filters.category !== 'all' ? '(Active)' : ''}
+            <Filter className="w-3.5 h-3.5 text-brand-emerald" />
+            <span>Filters</span>
           </button>
 
+          {/* Sort By Dropdown */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">Sort By:</span>
+            <ArrowUpDown className="w-3.5 h-3.5 text-brand-text-muted" />
             <select
               value={filters.sortBy}
-              onChange={(e) =>
-                setFilters({
-                  ...filters,
-                  sortBy: e.target.value as 'recommended' | 'price_low' | 'price_high' | 'rating',
-                })
-              }
-              className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              onChange={(e) => setFilters({ ...filters, sortBy: e.target.value as any })}
+              className="text-xs font-semibold px-3 py-2 rounded-xl border border-brand-border bg-brand-surface text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-emerald"
             >
               <option value="recommended">Recommended</option>
               <option value="price_low">Price: Low to High</option>
               <option value="price_high">Price: High to Low</option>
-              <option value="rating">Host Rating</option>
+              <option value="rating">Highest Rated Host</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Sidebar Filters + Vehicles List */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
-        {/* Desktop Sidebar Filter */}
-        <div className="hidden md:block md:col-span-1">
-          <div className="sticky top-24">
+      {/* Main Grid with Sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+        {/* Desktop Filter Sidebar */}
+        <div className="hidden lg:block lg:col-span-1 sticky top-24">
+          <VehicleFilter
+            filters={filters}
+            onChange={setFilters}
+            onReset={handleResetFilters}
+            locations={uniqueLocations}
+          />
+        </div>
+
+        {/* Mobile Filter Sheet */}
+        {showMobileFilters && (
+          <div className="lg:hidden col-span-1">
             <VehicleFilter
               filters={filters}
               onChange={setFilters}
@@ -152,25 +169,10 @@ function ExploreContent() {
               locations={uniqueLocations}
             />
           </div>
-        </div>
-
-        {/* Mobile Filter Drawer */}
-        {showMobileFilters && (
-          <div className="md:hidden col-span-1">
-            <VehicleFilter
-              filters={filters}
-              onChange={(f) => {
-                setFilters(f);
-                setShowMobileFilters(false);
-              }}
-              onReset={handleResetFilters}
-              locations={uniqueLocations}
-            />
-          </div>
         )}
 
         {/* Vehicle Cards Grid */}
-        <div className="md:col-span-3">
+        <div className="lg:col-span-3">
           {filteredVehicles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredVehicles.map((vehicle) => (
@@ -178,20 +180,21 @@ function ExploreContent() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
-                <SearchX className="w-8 h-8" />
+            <div className="bg-white rounded-3xl border border-brand-border p-12 text-center shadow-card space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-brand-surface flex items-center justify-center mx-auto text-brand-text-muted">
+                <SearchX className="w-8 h-8 stroke-[1.5]" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">No matching vehicles found</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Try widening your price range, clearing some filters, or switching categories to see
-                more available rides.
+              <h3 className="text-lg font-display font-bold text-brand-navy">
+                No vehicles matched your current filters
+              </h3>
+              <p className="text-xs text-brand-text-muted max-w-md mx-auto">
+                Try widening your price range, clearing the location filter, or switching between Cars, Bikes and Scooters.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 text-xs font-bold bg-slate-900 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+                className="mt-2 px-5 py-2.5 rounded-full text-xs font-bold bg-brand-navy hover:bg-brand-emerald text-white transition-colors"
               >
-                Reset All Filters
+                Clear All Filters
               </button>
             </div>
           )}
@@ -203,13 +206,7 @@ function ExploreContent() {
 
 export default function ExplorePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="max-w-7xl mx-auto px-4 py-16 text-center text-xs text-slate-500">
-          Loading vehicle catalogue...
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="p-8 text-center text-xs text-brand-text-muted">Loading explore catalog...</div>}>
       <ExploreContent />
     </Suspense>
   );
