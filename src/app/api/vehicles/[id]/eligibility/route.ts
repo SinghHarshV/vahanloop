@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkVehicleEligibility } from '@/lib/vehicleEligibility';
 import { getSession } from '@/lib/auth';

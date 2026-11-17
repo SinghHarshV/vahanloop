@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateBookingPrice } from '@/lib/pricing';
 import { db } from '@/lib/db';
