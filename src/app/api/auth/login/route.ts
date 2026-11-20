@@ -3,9 +3,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyPassword, signSession, setSessionCookie, UserRoleType } from '@/lib/auth';
 import { loginSchema } from '@/lib/validations';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimit = await checkRateLimit(req, 'auth');
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many authentication attempts. Please try again in 60 seconds.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': String(rateLimit.limit),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(rateLimit.reset),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const parsed = loginSchema.safeParse(body);
 

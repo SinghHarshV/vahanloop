@@ -1,6 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export interface UploadedFileValidation {
   valid: boolean;
@@ -52,7 +59,7 @@ export function validateFileMagicBytes(buffer: Buffer): { valid: boolean; detect
 export function validateDocumentFile(
   filename: string,
   buffer: Buffer,
-  declaredMimeType: string
+  declaredMimeType?: string
 ): UploadedFileValidation {
   // 1. File size check
   if (buffer.length > MAX_DOCUMENT_FILE_SIZE) {
@@ -87,7 +94,8 @@ export function validateDocumentFile(
 }
 
 export interface DocumentStorageProvider {
-  saveDocument(fileKey: string, buffer: Buffer, mimeType: string): Promise<string>;
+  providerName: string;
+  saveDocument(fileKey: string, buffer: Buffer, mimeType?: string): Promise<string>;
   readDocument(fileKey: string): Promise<Buffer | null>;
   generateSignedUrl(fileKey: string, expiresInSeconds?: number): Promise<string>;
   deleteDocument(fileKey: string): Promise<boolean>;
@@ -98,12 +106,19 @@ export interface DocumentStorageProvider {
  * Stores documents completely outside the public web root in a secure isolated storage directory.
  */
 export class LocalPrivateDocumentStorage implements DocumentStorageProvider {
+  public providerName = 'LOCAL';
   private baseDir: string;
 
   constructor() {
     this.baseDir = path.join(process.cwd(), 'storage', 'private_documents');
     if (!fs.existsSync(this.baseDir)) {
-      fs.mkdirSync(this.baseDir, { recursive: true });
+      try {
+        fs.mkdirSync(this.baseDir, { recursive: true });
+      } catch (e) {
+        // Fallback to /tmp on serverless read-only filesystem
+        this.baseDir = path.join('/tmp', 'vahanloop_storage');
+        fs.mkdirSync(this.baseDir, { recursive: true });
+      }
     }
   }
 
@@ -145,4 +160,102 @@ export class LocalPrivateDocumentStorage implements DocumentStorageProvider {
   }
 }
 
-export const documentStorage: DocumentStorageProvider = new LocalPrivateDocumentStorage();
+/**
+ * S3-Compatible Managed Cloud Storage
+ * Supports AWS S3, Cloudflare R2, MinIO, or Supabase Storage with presigned URLs.
+ */
+export class S3CompatibleDocumentStorage implements DocumentStorageProvider {
+  public providerName = 'S3';
+  private client: S3Client;
+  private bucket: string;
+
+  constructor() {
+    this.bucket = process.env.S3_BUCKET_NAME || '';
+    const region = process.env.S3_REGION || process.env.AWS_REGION || 'ap-south-1';
+    const endpoint = process.env.S3_ENDPOINT; // e.g. for Cloudflare R2: https://<id>.r2.cloudflarestorage.com
+    const accessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID || '';
+    const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY || '';
+
+    this.client = new S3Client({
+      region,
+      endpoint: endpoint || undefined,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+      forcePathStyle: Boolean(endpoint && endpoint.includes('localhost')),
+    });
+  }
+
+  async saveDocument(fileKey: string, buffer: Buffer, mimeType: string = 'application/octet-stream'): Promise<string> {
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: fileKey,
+      Body: buffer,
+      ContentType: mimeType,
+      ServerSideEncryption: 'AES256',
+    });
+    await this.client.send(command);
+    return fileKey;
+  }
+
+  async readDocument(fileKey: string): Promise<Buffer | null> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: fileKey,
+      });
+      const response = await this.client.send(command);
+      if (!response.Body) return null;
+      const byteArray = await response.Body.transformToByteArray();
+      return Buffer.from(byteArray);
+    } catch (e) {
+      console.error(`S3 read error for key ${fileKey}:`, e);
+      return null;
+    }
+  }
+
+  async generateSignedUrl(fileKey: string, expiresInSeconds: number = 300): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: fileKey,
+    });
+    return getSignedUrl(this.client, command, { expiresIn: expiresInSeconds });
+  }
+
+  async deleteDocument(fileKey: string): Promise<boolean> {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: fileKey,
+      });
+      await this.client.send(command);
+      return true;
+    } catch (e) {
+      console.error(`S3 delete error for key ${fileKey}:`, e);
+      return false;
+    }
+  }
+}
+
+/**
+ * Storage Provider Factory
+ */
+export function getDocumentStorage(): DocumentStorageProvider {
+  const bucket = process.env.S3_BUCKET_NAME;
+  const accessKey = process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
+  const secretKey = process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
+
+  if (bucket && accessKey && secretKey) {
+    try {
+      return new S3CompatibleDocumentStorage();
+    } catch (err) {
+      console.warn('Failed to initialize S3 storage, falling back to local private storage:', err);
+      return new LocalPrivateDocumentStorage();
+    }
+  }
+
+  return new LocalPrivateDocumentStorage();
+}
+
+export const documentStorage: DocumentStorageProvider = getDocumentStorage();

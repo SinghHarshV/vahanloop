@@ -3,9 +3,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, signSession, setSessionCookie, UserRoleType } from '@/lib/auth';
 import { registerSchema } from '@/lib/validations';
+import { checkRateLimit } from '@/lib/rateLimit';
+import { sendNotification } from '@/lib/notifications';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimit = await checkRateLimit(req, 'auth');
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many registration requests. Please wait a moment.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': String(rateLimit.limit),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(rateLimit.reset),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const parsed = registerSchema.safeParse(body);
 
@@ -89,6 +107,14 @@ export async function POST(req: NextRequest) {
         details: `Registered as ${requestedRole}`,
       },
     });
+
+    // Send welcome notification asynchronously
+    sendNotification('ACCOUNT_WELCOME', {
+      userId: user.id,
+      name: user.fullName,
+      email: user.email,
+      phone: user.phone,
+    }, {}).catch((err) => console.error('Welcome notification error:', err));
 
     const response = NextResponse.json(
       {

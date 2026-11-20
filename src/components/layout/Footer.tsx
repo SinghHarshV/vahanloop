@@ -144,9 +144,15 @@ export const Footer: React.FC = () => {
         <div className="mt-12 pt-8 border-t border-brand-navy-light/60 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
           <p>© {new Date().getFullYear()} VahanLoop Mobility Inc. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-slate-300 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-slate-300 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-slate-300 cursor-pointer">Guest Protection</span>
+            <Link href="/terms" className="hover:text-brand-emerald transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-brand-emerald transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-brand-emerald transition-colors">
+              Guest Protection
+            </Link>
           </div>
         </div>
       </div>

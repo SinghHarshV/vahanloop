@@ -10,13 +10,17 @@
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node scripts/seed.mjs",
     "test:api": "node scripts/test-api.mjs",
     "test:phase3": "node scripts/test-phase3.mjs",
     "test:phase5": "node scripts/test-phase5.mjs",
-    "test": "node scripts/test-phase3.mjs && node scripts/test-phase5.mjs"
+    "test:phase6": "node scripts/test-phase6.mjs",
+    "test": "node scripts/test-phase3.mjs && node scripts/test-phase5.mjs && node scripts/test-phase6.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1173.0",
+    "@aws-sdk/s3-request-presigner": "^3.1173.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
