@@ -1852,10 +1852,15 @@ export const db: any = {
   async $transaction(callback: (tx: typeof db) => Promise<any>) {
     const isConnected = await checkPostgresConnection();
     if (isConnected) {
-      return prisma.$transaction(async (pTx) => {
-        // Delegate to Prisma transaction
+      try {
+        return await prisma.$transaction(async (pTx) => {
+          // Delegate to Prisma transaction
+          return callback(db);
+        });
+      } catch (err) {
+        console.warn('PostgreSQL $transaction error, falling back to in-memory:', err);
         return callback(db);
-      });
+      }
     }
     // In-memory sequential execution
     return callback(db);

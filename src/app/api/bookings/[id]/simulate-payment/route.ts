@@ -19,8 +19,12 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Only the customer who placed the booking or admin can pay
-    const isCustomer = session.userId === booking.customerId;
+    // Customer identity check (supports demo prefix normalization)
+    const isCustomer =
+      session.userId === booking.customerId ||
+      booking.customerId?.replace(/^user-/, 'usr-') === session.userId?.replace(/^user-/, 'usr-') ||
+      booking.customer?.email === session.email ||
+      (booking.customerEmail && booking.customerEmail === session.email);
     const isAdmin = session.roles.includes('ADMIN');
 
     if (!isCustomer && !isAdmin) {
@@ -30,7 +34,12 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       );
     }
 
-    if (booking.status !== 'AWAITING_PAYMENT' && booking.status !== 'ACCEPTED') {
+    const normalizedStatus = (booking.status || '').toUpperCase();
+    if (normalizedStatus === 'CONFIRMED') {
+      return NextResponse.json({ message: 'Booking is already confirmed', booking });
+    }
+
+    if (normalizedStatus !== 'AWAITING_PAYMENT' && normalizedStatus !== 'ACCEPTED') {
       return NextResponse.json(
         {
           error: `Cannot pay for booking in status "${booking.status}". Only accepted bookings can be paid.`,

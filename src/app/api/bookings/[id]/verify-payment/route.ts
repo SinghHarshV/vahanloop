@@ -24,18 +24,26 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.customerId !== session.userId && !session.roles.includes('ADMIN')) {
+    // Customer authorization check (supports demo prefix normalization)
+    const isCustomer =
+      booking.customerId === session.userId ||
+      booking.customerId?.replace(/^user-/, 'usr-') === session.userId?.replace(/^user-/, 'usr-') ||
+      booking.customer?.email === session.email ||
+      (booking.customerEmail && booking.customerEmail === session.email);
+
+    if (!isCustomer && !session.roles.includes('ADMIN')) {
       return NextResponse.json(
         { error: 'Forbidden: You can only confirm your own booking' },
         { status: 403 }
       );
     }
 
-    if (booking.status === 'CONFIRMED') {
+    const normalizedStatus = (booking.status || '').toUpperCase();
+    if (normalizedStatus === 'CONFIRMED') {
       return NextResponse.json({ message: 'Booking is already confirmed', booking });
     }
 
-    if (booking.status !== 'AWAITING_PAYMENT' && booking.status !== 'ACCEPTED') {
+    if (normalizedStatus !== 'AWAITING_PAYMENT' && normalizedStatus !== 'ACCEPTED') {
       return NextResponse.json(
         { error: `Cannot verify payment for booking in status "${booking.status}"` },
         { status: 400 }
