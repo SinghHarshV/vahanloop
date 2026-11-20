@@ -57,7 +57,7 @@ export default function RegisterPage() {
     const result = await register({
       fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
-      phone: phone.trim(),
+      phone: phone.trim().replace(/[\s\-()]/g, ''),
       password,
       role: accountType,
       ownerType: accountType === 'owner' ? ownerType : undefined,

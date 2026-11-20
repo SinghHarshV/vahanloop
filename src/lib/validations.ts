@@ -3,9 +3,15 @@ import { z } from 'zod';
 export const registerSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits').max(15),
+  phone: z.preprocess(
+    (val) => (typeof val === 'string' ? val.replace(/[\s\-()]/g, '') : val),
+    z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number cannot exceed 15 digits')
+  ),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['CUSTOMER', 'OWNER']).default('CUSTOMER'),
+  role: z.preprocess(
+    (val) => (typeof val === 'string' ? val.toUpperCase() : val),
+    z.enum(['CUSTOMER', 'OWNER'])
+  ).default('CUSTOMER'),
   ownerType: z.enum(['INDIVIDUAL', 'BUSINESS']).optional(),
   businessName: z.string().optional(),
 });

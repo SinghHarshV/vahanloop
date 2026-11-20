@@ -45,26 +45,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    const userRoles = (user.roles || []).map((r: any) => r.role as UserRoleType);
+    const userRoles = (user.roles || []).map((r: any) =>
+      (typeof r === 'string' ? r : r?.role || 'CUSTOMER') as UserRoleType
+    );
 
     const sessionToken = await signSession({
       userId: user.id,
       email: user.email,
       fullName: user.fullName,
       phone: user.phone,
-      roles: userRoles,
+      roles: userRoles.length > 0 ? userRoles : ['CUSTOMER'],
       ownerProfileId: user.ownerProfile?.id,
     });
 
-    await db.auditLog.create({
-      data: {
-        actorId: user.id,
-        action: 'USER_LOGIN',
-        entityType: 'USER',
-        entityId: user.id,
-        details: 'User logged in successfully',
-      },
-    });
+    try {
+      await db.auditLog.create({
+        data: {
+          actorId: user.id,
+          action: 'USER_LOGIN',
+          entityType: 'USER',
+          entityId: user.id,
+          details: 'User logged in successfully',
+        },
+      });
+    } catch (auditErr) {
+      console.warn('Audit log record non-fatal warning:', auditErr);
+    }
 
     const response = NextResponse.json({
       message: 'Logged in successfully',

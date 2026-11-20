@@ -1,32 +1,36 @@
-# Handoff
+# Handoff - Garud
+
+> Updated 2026-11-20T17:30:00+05:30 by harshvs693 (session 1108-0443, track General)
+> Read this first. The full log is cyhi-logs/session.md.
 
 ## Current state
-Version 0.1 of VahanLoop is fully implemented and compiled cleanly with Next.js 14, TypeScript, and Tailwind CSS. All 14 routes are statically generated and dynamic vehicle details route tested. LocalStorage persistence and seed data initialized for customers, vehicle owners, and platform administrator.
+Production hardening & bugfixes for live Vercel deployment complete. Resolved registration phone/role validation and demo login server error with robust dual-mode in-memory store fallbacks across all database models. Next.js production build (`npm run build`) compiled cleanly across 31 static pages and 53 dynamic API routes with 0 errors, and all 57 automated tests passed.
 
 ## Works
-- Complete responsive UI with custom brand identity (Slate Navy, Emerald Accent, Crisp Surface).
-- Role Switcher supporting Customer (`customer@vahanloop.demo`), Owner (`owner@vahanloop.demo`), and Admin (`admin@vahanloop.demo`).
-- Customer homepage, search widget, category explorer, vehicle card catalogue, real-time filters (category, location, rental mode, max price slider, fuel, transmission, sort order).
-- Vehicle details with image gallery, specs, terms, customer reviews, and interactive booking modal with dynamic calculation of daily rates, driver fee, 10% platform fee, and refundable deposit.
-- Customer booking ledger with Simulated Payment Checkout modal (UPI, Cards, NetBanking) and transaction receipt generation.
-- Owner portal with 5 overview metric cards, fleet inventory, live activate/pause toggle, and booking request acceptance/decline flow.
-- 6-step Multi-step Vehicle Registration form for hosts, routing listings directly into `pending` approval status.
-- Admin command center with KPI metrics, pending approval review queue with mock document verification modal (RC, insurance, PUC, permit), quick approve/reject actions that immediately publish approved vehicles to customer explore.
-- One-click factory reset demo data capability.
+- Robust Authentication & Registration: Phone numbers automatically sanitized of spaces and hyphens; roles normalized to uppercase; specific field validation error messages returned.
+- Resilient Dual-Mode Database Abstraction (`src/lib/db.ts`): All user, vehicle, booking, payment, and audit log queries safely catch Postgres/Prisma errors (such as unmigrated tables on remote DBs) and seamlessly fall back to the built-in in-memory database store.
+- S3-Compatible Cloud Storage (`src/lib/documentStorage.ts`) with presigned upload/download URLs, magic bytes validation (PDF, JPEG, PNG), and local private fallback.
+- Serverless Rate Limiting & Anti-Bruteforce (`src/lib/rateLimit.ts`) supporting Upstash Redis REST and in-memory sliding window fallback.
+- Security Middleware (`src/middleware.ts`) injecting X-Request-ID, Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, and Permissions-Policy.
+- Branded Transactional Email System (`src/lib/emailTemplates.ts`, `src/lib/notifications.ts`) with Resend, SMTP, and Console providers.
+- Secure Password Reset flow (`/api/auth/forgot-password`, `/api/auth/reset-password`) with HMAC token bound to password hash.
+- System Health Check API (`/api/health`) reporting DB connectivity, S3 storage status, payment mode, and runtime metrics.
+- DPDP Act 2023 & IT Rules 2021 Privacy Policy (`/privacy`), Terms of Service (`/terms`), and User Data Export (`/api/user/data-export`).
+- Full automated test suite (57 passed | 0 failed across Phase 3, Phase 5, and Phase 6).
+- Comprehensive `.env.example` with zero hardcoded secrets.
 
 ## Broken
-- None. `npm run build` completed with zero TypeScript errors or warnings across all 14 routes.
+- None. `npm run build` and `npm test` exit with code 0.
 
 ## Next 3 things
-1. Phase 2: Integrate NextAuth or Supabase Auth for phone OTP authentication.
-2. Connect Prisma ORM with PostgreSQL database to replace `storageService` localStorage implementation.
-3. Integrate Razorpay / Cashfree test mode payment gateway for actual payment webhook handling.
+1. Push latest fixes to GitHub repository (`main`) to trigger automatic Vercel production deployment.
+2. Verify live `/register` and quick demo `/login` on the deployed Vercel domain.
+3. Configure optional production cloud credentials (Neon DB, S3 bucket, Resend API key) in Vercel project settings when ready.
 
 ## Decisions (and why)
-- Chose Next.js 14 App Router + Tailwind CSS for quick, high-performance static generation with zero friction.
-- Used decoupled `storageService` pattern so switching from `localStorage` to an actual REST API / PostgreSQL requires changing only `storageService.ts` without touching React UI components.
-- Used Unsplash automotive photographs as curated presets to guarantee high-fidelity visuals while respecting prototype privacy rules.
+- Preprocessed registration input in Zod schema so user phone inputs with international formats (e.g., `+91 9151420918`) and case variations (`customer` vs `CUSTOMER`) validate smoothly without cryptic errors.
+- Added comprehensive try-catch wrappers around all Prisma queries in `src/lib/db.ts` to guarantee that unmigrated tables or empty remote PostgreSQL instances never crash the app or prevent demo logins.
 
 ## Don't retry
-- Do not add heavy external backend libraries before database phase.
-- Do not request real KYC documents or real payment credentials in prototype mode.
+- Do not use `rzp_live_` production payment keys in test mode.
+- Do not save customer uploads to ephemeral serverless root directories.

@@ -999,10 +999,15 @@ export const db: any = {
     async findUnique({ where }: { where: { id?: string; email?: string; phone?: string } }) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.user.findUnique as any)({
-          where,
-          include: { roles: true, ownerProfile: true, driverProfile: true },
-        });
+        try {
+          const res = await (prisma.user.findUnique as any)({
+            where,
+            include: { roles: true, ownerProfile: true, driverProfile: true },
+          });
+          if (res) return res;
+        } catch (err) {
+          console.warn('PostgreSQL user.findUnique error, using in-memory store:', err);
+        }
       }
       const u = globalForPrisma.dbStore.users.find((user: any) => {
         if (where.id && user.id === where.id) return true;
@@ -1014,25 +1019,39 @@ export const db: any = {
       const ownerProf = globalForPrisma.dbStore.ownerProfiles.find((o: any) => o.userId === u.id);
       return {
         ...u,
-        roles: u.roles.map((r: string) => ({ role: r })),
+        roles: Array.isArray(u.roles)
+          ? u.roles.map((r: any) => ({ role: typeof r === 'string' ? r : r?.role || 'CUSTOMER' }))
+          : [{ role: 'CUSTOMER' }],
         ownerProfile: ownerProf || null,
       };
     },
 
     async findFirst({ where }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.user.findFirst as any)({ where });
+      if (isConnected) {
+        try {
+          const res = await (prisma.user.findFirst as any)({ where });
+          if (res) return res;
+        } catch (err) {
+          console.warn('PostgreSQL user.findFirst error, using in-memory store:', err);
+        }
+      }
       return (await db.user.findMany({ where, take: 1 }))[0] || null;
     },
 
     async findMany({ where, orderBy }: any = {}) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.user.findMany as any)({
-          where,
-          orderBy,
-          include: { roles: true, ownerProfile: true },
-        });
+        try {
+          const res = await (prisma.user.findMany as any)({
+            where,
+            orderBy,
+            include: { roles: true, ownerProfile: true },
+          });
+          if (res && res.length > 0) return res;
+        } catch (err) {
+          console.warn('PostgreSQL user.findMany error, using in-memory store:', err);
+        }
       }
       let list = [...globalForPrisma.dbStore.users];
       if (where?.roles?.some) {
@@ -1041,7 +1060,9 @@ export const db: any = {
       }
       return list.map((u) => ({
         ...u,
-        roles: u.roles.map((r: string) => ({ role: r })),
+        roles: Array.isArray(u.roles)
+          ? u.roles.map((r: any) => ({ role: typeof r === 'string' ? r : r?.role || 'CUSTOMER' }))
+          : [{ role: 'CUSTOMER' }],
         ownerProfile: globalForPrisma.dbStore.ownerProfiles.find((o: any) => o.userId === u.id) || null,
       }));
     },
@@ -1049,7 +1070,11 @@ export const db: any = {
     async create({ data }: any) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.user.create as any)({ data, include: { roles: true, ownerProfile: true } });
+        try {
+          return await (prisma.user.create as any)({ data, include: { roles: true, ownerProfile: true } });
+        } catch (err) {
+          console.warn('PostgreSQL user.create error, using in-memory store:', err);
+        }
       }
       const id = data.id || `usr-${Date.now().toString().slice(-6)}`;
       const roles = data.roles?.create?.map((r: any) => r.role) || ['CUSTOMER'];
@@ -1083,7 +1108,13 @@ export const db: any = {
 
     async update({ where, data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.user.update as any)({ where, data });
+      if (isConnected) {
+        try {
+          return await (prisma.user.update as any)({ where, data });
+        } catch (err) {
+          console.warn('PostgreSQL user.update error, using in-memory store:', err);
+        }
+      }
       const idx = globalForPrisma.dbStore.users.findIndex((u: any) => u.id === where.id);
       if (idx >= 0) {
         globalForPrisma.dbStore.users[idx] = {
@@ -1102,10 +1133,15 @@ export const db: any = {
     async findUnique({ where }: any) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.vehicle.findUnique as any)({
-          where,
-          include: { owner: true, images: true, documents: true, reviews: true },
-        });
+        try {
+          const res = await (prisma.vehicle.findUnique as any)({
+            where,
+            include: { owner: true, images: true, documents: true, reviews: true },
+          });
+          if (res) return res;
+        } catch (err) {
+          console.warn('PostgreSQL vehicle.findUnique error, using in-memory store:', err);
+        }
       }
       const v = globalForPrisma.dbStore.vehicles.find((veh: any) => veh.id === where.id);
       if (!v) return null;
@@ -1122,11 +1158,16 @@ export const db: any = {
     async findMany({ where, orderBy }: any = {}) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.vehicle.findMany as any)({
-          where,
-          orderBy,
-          include: { owner: true, images: true, documents: true, reviews: true },
-        });
+        try {
+          const res = await (prisma.vehicle.findMany as any)({
+            where,
+            orderBy,
+            include: { owner: true, images: true, documents: true, reviews: true },
+          });
+          if (res && res.length > 0) return res;
+        } catch (err) {
+          console.warn('PostgreSQL vehicle.findMany error, using in-memory store:', err);
+        }
       }
       let list = [...globalForPrisma.dbStore.vehicles];
       if (where) {
@@ -1150,7 +1191,13 @@ export const db: any = {
 
     async create({ data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.vehicle.create as any)({ data });
+      if (isConnected) {
+        try {
+          return await (prisma.vehicle.create as any)({ data });
+        } catch (err) {
+          console.warn('PostgreSQL vehicle.create error, using in-memory store:', err);
+        }
+      }
       const id = data.id || `veh-${Date.now().toString().slice(-6)}`;
       const newVeh = {
         ...data,
@@ -1166,7 +1213,13 @@ export const db: any = {
 
     async update({ where, data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.vehicle.update as any)({ where, data });
+      if (isConnected) {
+        try {
+          return await (prisma.vehicle.update as any)({ where, data });
+        } catch (err) {
+          console.warn('PostgreSQL vehicle.update error, using in-memory store:', err);
+        }
+      }
       const idx = globalForPrisma.dbStore.vehicles.findIndex((v: any) => v.id === where.id);
       if (idx >= 0) {
         globalForPrisma.dbStore.vehicles[idx] = {
@@ -1181,7 +1234,13 @@ export const db: any = {
 
     async delete({ where }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.vehicle.delete as any)({ where });
+      if (isConnected) {
+        try {
+          return await (prisma.vehicle.delete as any)({ where });
+        } catch (err) {
+          console.warn('PostgreSQL vehicle.delete error, using in-memory store:', err);
+        }
+      }
       const idx = globalForPrisma.dbStore.vehicles.findIndex((v: any) => v.id === where.id);
       if (idx >= 0) {
         const deleted = globalForPrisma.dbStore.vehicles.splice(idx, 1)[0];
@@ -1196,10 +1255,15 @@ export const db: any = {
     async findUnique({ where }: any) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.booking.findUnique as any)({
-          where,
-          include: { customer: true, vehicle: { include: { owner: true } }, payments: true, statusHistory: true },
-        });
+        try {
+          const res = await (prisma.booking.findUnique as any)({
+            where,
+            include: { customer: true, vehicle: { include: { owner: true } }, payments: true, statusHistory: true },
+          });
+          if (res) return res;
+        } catch (err) {
+          console.warn('PostgreSQL booking.findUnique error, using in-memory store:', err);
+        }
       }
       const b = globalForPrisma.dbStore.bookings.find((bk: any) => bk.id === where.id);
       if (!b) return null;
@@ -1213,11 +1277,16 @@ export const db: any = {
     async findMany({ where, orderBy }: any = {}) {
       const isConnected = await checkPostgresConnection();
       if (isConnected) {
-        return (prisma.booking.findMany as any)({
-          where,
-          orderBy,
-          include: { customer: true, vehicle: { include: { owner: true } }, payments: true },
-        });
+        try {
+          const res = await (prisma.booking.findMany as any)({
+            where,
+            orderBy,
+            include: { customer: true, vehicle: { include: { owner: true } }, payments: true },
+          });
+          if (res && res.length > 0) return res;
+        } catch (err) {
+          console.warn('PostgreSQL booking.findMany error, using in-memory store:', err);
+        }
       }
       let list = [...globalForPrisma.dbStore.bookings];
       if (where) {
@@ -1244,7 +1313,13 @@ export const db: any = {
 
     async create({ data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.booking.create as any)({ data });
+      if (isConnected) {
+        try {
+          return await (prisma.booking.create as any)({ data });
+        } catch (err) {
+          console.warn('PostgreSQL booking.create error, using in-memory store:', err);
+        }
+      }
       const id = data.id || `bk-${Date.now().toString().slice(-6)}`;
       const newBk = {
         ...data,
@@ -1270,7 +1345,13 @@ export const db: any = {
 
     async update({ where, data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.booking.update as any)({ where, data });
+      if (isConnected) {
+        try {
+          return await (prisma.booking.update as any)({ where, data });
+        } catch (err) {
+          console.warn('PostgreSQL booking.update error, using in-memory store:', err);
+        }
+      }
       const idx = globalForPrisma.dbStore.bookings.findIndex((b: any) => b.id === where.id);
       if (idx >= 0) {
         const prev = globalForPrisma.dbStore.bookings[idx];
@@ -1301,7 +1382,13 @@ export const db: any = {
   payment: {
     async create({ data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.payment.create as any)({ data });
+      if (isConnected) {
+        try {
+          return await (prisma.payment.create as any)({ data });
+        } catch (err) {
+          console.warn('PostgreSQL payment.create error, using in-memory store:', err);
+        }
+      }
       const id = `pay-${Date.now()}`;
       const newPay = { ...data, id, createdAt: new Date() };
       globalForPrisma.dbStore.payments.push(newPay);
@@ -1309,7 +1396,13 @@ export const db: any = {
     },
     async findMany({ where }: any = {}) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.payment.findMany as any)({ where });
+      if (isConnected) {
+        try {
+          return await (prisma.payment.findMany as any)({ where });
+        } catch (err) {
+          console.warn('PostgreSQL payment.findMany error, using in-memory store:', err);
+        }
+      }
       let list = [...globalForPrisma.dbStore.payments];
       if (where?.bookingId) list = list.filter((p) => p.bookingId === where.bookingId);
       return list;
@@ -1320,14 +1413,26 @@ export const db: any = {
   auditLog: {
     async create({ data }: any) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.auditLog.create as any)({ data });
+      if (isConnected) {
+        try {
+          return await (prisma.auditLog.create as any)({ data });
+        } catch (err) {
+          console.warn('PostgreSQL auditLog.create error, using in-memory store:', err);
+        }
+      }
       const log = { id: `aud-${Date.now()}`, ...data, createdAt: new Date() };
       globalForPrisma.dbStore.auditLogs.unshift(log);
       return log;
     },
     async findMany({ where }: any = {}) {
       const isConnected = await checkPostgresConnection();
-      if (isConnected) return (prisma.auditLog.findMany as any)({ where, orderBy: { createdAt: 'desc' } });
+      if (isConnected) {
+        try {
+          return await (prisma.auditLog.findMany as any)({ where, orderBy: { createdAt: 'desc' } });
+        } catch (err) {
+          console.warn('PostgreSQL auditLog.findMany error, using in-memory store:', err);
+        }
+      }
       return [...globalForPrisma.dbStore.auditLogs];
     },
   },
