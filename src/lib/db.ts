@@ -6,24 +6,39 @@ const globalForPrisma = globalThis as unknown as {
   dbStore: any | undefined;
 };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  });
+let prismaInstance: PrismaClient | null = null;
+try {
+  prismaInstance =
+    globalForPrisma.prisma ??
+    new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    });
+  if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prismaInstance;
+} catch (e) {
+  console.warn('Prisma client instantiation skipped; using in-memory store:', e);
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = (prismaInstance || {}) as PrismaClient;
 
 // Flag to track whether PostgreSQL is connected
 let isPostgresAvailable: boolean | null = null;
 
 export async function checkPostgresConnection(): Promise<boolean> {
+  if (!prismaInstance || !process.env.DATABASE_URL) {
+    isPostgresAvailable = false;
+    return false;
+  }
+  // In production cloud environments without external PostgreSQL, bypass localhost connection attempts
+  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL.includes('localhost')) {
+    isPostgresAvailable = false;
+    return false;
+  }
   if (isPostgresAvailable !== null) return isPostgresAvailable;
   try {
     // 1-second timeout probe
     await Promise.race([
-      prisma.$queryRaw`SELECT 1`,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('DB Timeout')), 1200)),
+      prismaInstance.$queryRaw`SELECT 1`,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('DB Timeout')), 1000)),
     ]);
     isPostgresAvailable = true;
     return true;
