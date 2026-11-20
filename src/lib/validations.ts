@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const registerSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
+  email: z.preprocess(
+    (val) => (typeof val === 'string' ? val.trim().toLowerCase() : val),
+    z.string().email('Please enter a valid email address')
+  ),
   phone: z.preprocess(
     (val) => (typeof val === 'string' ? val.replace(/[\s\-()]/g, '') : val),
     z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number cannot exceed 15 digits')
@@ -17,7 +20,10 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.preprocess(
+    (val) => (typeof val === 'string' ? val.trim().toLowerCase() : val),
+    z.string().email('Please enter a valid email address')
+  ),
   password: z.string().min(1, 'Password is required'),
 });
 

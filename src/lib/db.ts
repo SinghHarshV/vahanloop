@@ -1134,9 +1134,11 @@ export function getInitialSeedData() {
   };
 }
 
+if (!globalForPrisma.dbStore) {
+  globalForPrisma.dbStore = getInitialSeedData();
+}
+
 // Unified Database API with auto-fallback to persistent store
-// The in-memory store is initialized lazily on first access to avoid
-// running bcrypt.hashSync during Vercel's static page data collection phase.
 export const db: any = {
   get store() {
     if (!globalForPrisma.dbStore) {

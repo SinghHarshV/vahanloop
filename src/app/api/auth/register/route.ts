@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
-      const firstError = Object.values(fieldErrors)[0]?.[0] || 'Validation failed';
+      const firstError = parsed.error.issues[0]?.message || Object.values(fieldErrors)[0]?.[0] || 'Validation failed';
       return NextResponse.json(
         { error: firstError, details: fieldErrors },
         { status: 400 }

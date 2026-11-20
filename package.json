@@ -12,11 +12,12 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node scripts/seed.mjs",
+    "test:auth": "node scripts/test-auth.mjs",
     "test:api": "node scripts/test-api.mjs",
     "test:phase3": "node scripts/test-phase3.mjs",
     "test:phase5": "node scripts/test-phase5.mjs",
     "test:phase6": "node scripts/test-phase6.mjs",
-    "test": "node scripts/test-phase3.mjs && node scripts/test-phase5.mjs && node scripts/test-phase6.mjs"
+    "test": "node scripts/test-auth.mjs && node scripts/test-phase3.mjs && node scripts/test-phase5.mjs && node scripts/test-phase6.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1173.0",
