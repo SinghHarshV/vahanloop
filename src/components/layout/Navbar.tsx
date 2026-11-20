@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useMarketplace } from '@/context/MarketplaceContext';
 import { RoleSwitcher } from './RoleSwitcher';
@@ -22,13 +22,14 @@ import {
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser, primaryRole } = useAuth();
   const { bookings } = useMarketplace();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState('Delhi NCR');
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
 
-  const CITIES = ['Delhi NCR', 'Bengaluru', 'Mumbai', 'Goa', 'Hyderabad', 'Pune'];
+  const CITIES = ['Delhi NCR', 'Bengaluru', 'Mumbai', 'Goa', 'Hyderabad', 'Pune', 'Jabalpur'];
 
   const customerBookingsCount = currentUser
     ? bookings.filter((b) => b.customerId === currentUser.id && b.status !== 'cancelled').length
@@ -79,6 +80,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => {
                         setSelectedCity(city);
                         setCityDropdownOpen(false);
+                        router.push(`/explore?location=${encodeURIComponent(city)}`);
                       }}
                       className={`w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-brand-surface flex items-center justify-between ${
                         selectedCity === city ? 'text-brand-emerald font-bold bg-brand-emerald-subtle' : 'text-brand-text'

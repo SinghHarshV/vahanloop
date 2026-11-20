@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
             <div className="flex flex-col gap-2 pt-2 text-xs text-slate-400">
               <div className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-brand-emerald" />
-                <span>Delhi NCR · Bengaluru · Mumbai · Goa · Hyderabad · Pune</span>
+                <span>Delhi NCR · Bengaluru · Mumbai · Goa · Hyderabad · Pune · Jabalpur</span>
               </div>
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-brand-emerald" />

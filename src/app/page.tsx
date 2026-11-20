@@ -130,6 +130,10 @@ export default function HomePage() {
                       <option value="Koramangala, Bengaluru">Koramangala, Bengaluru</option>
                       <option value="HSR Layout, Bengaluru">HSR Layout, Bengaluru</option>
                       <option value="Whitefield, Bengaluru">Whitefield, Bengaluru</option>
+                      <option value="Civil Lines, Jabalpur">Civil Lines, Jabalpur</option>
+                      <option value="Vijay Nagar, Jabalpur">Vijay Nagar, Jabalpur</option>
+                      <option value="Wright Town, Jabalpur">Wright Town, Jabalpur</option>
+                      <option value="Tilhari, Jabalpur">Tilhari, Jabalpur</option>
                       <option value="Connaught Place, Delhi">Connaught Place, Delhi</option>
                       <option value="Cyber City, Gurugram">Cyber City, Gurugram</option>
                       <option value="Bandra West, Mumbai">Bandra West, Mumbai</option>

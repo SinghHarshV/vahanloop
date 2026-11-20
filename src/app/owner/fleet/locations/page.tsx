@@ -217,6 +217,7 @@ export default function FleetLocationsPage() {
                     <option value="Goa">Goa</option>
                     <option value="Hyderabad">Hyderabad</option>
                     <option value="Pune">Pune</option>
+                    <option value="Jabalpur">Jabalpur</option>
                   </select>
                 </div>
                 <div>

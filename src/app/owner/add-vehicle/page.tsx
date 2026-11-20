@@ -483,6 +483,10 @@ export default function AddVehiclePage() {
                   <option value="HSR Layout, Bengaluru">HSR Layout, Bengaluru</option>
                   <option value="Whitefield, Bengaluru">Whitefield, Bengaluru</option>
                   <option value="Jayanagar, Bengaluru">Jayanagar, Bengaluru</option>
+                  <option value="Civil Lines, Jabalpur">Civil Lines, Jabalpur</option>
+                  <option value="Vijay Nagar, Jabalpur">Vijay Nagar, Jabalpur</option>
+                  <option value="Wright Town, Jabalpur">Wright Town, Jabalpur</option>
+                  <option value="Tilhari, Jabalpur">Tilhari, Jabalpur</option>
                 </select>
               </div>
             </div>
