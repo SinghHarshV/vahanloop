@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -48,9 +47,13 @@ export async function checkPostgresConnection(): Promise<boolean> {
   }
 }
 
+// Pre-computed bcrypt hash for 'Demo@123456' — avoids synchronous hashing at module load time
+// which caused Vercel static-page data collection timeouts. Generated with bcrypt saltRounds=10.
+const DEMO_PASSWORD_HASH = '$2a$10$GoNN2IMhq/a3chxLhL9Rguaz.EO6qd0.GXn4uUZrj6Oq1wdowzqUm';
+
 // Fallback high-fidelity in-memory relational store for environments without active Docker/Postgres
 export function getInitialSeedData() {
-  const passwordHash = bcrypt.hashSync('Demo@123456', 10);
+  const passwordHash = DEMO_PASSWORD_HASH;
 
   const users = [
     {
@@ -1131,13 +1134,14 @@ export function getInitialSeedData() {
   };
 }
 
-if (!globalForPrisma.dbStore) {
-  globalForPrisma.dbStore = getInitialSeedData();
-}
-
 // Unified Database API with auto-fallback to persistent store
+// The in-memory store is initialized lazily on first access to avoid
+// running bcrypt.hashSync during Vercel's static page data collection phase.
 export const db: any = {
   get store() {
+    if (!globalForPrisma.dbStore) {
+      globalForPrisma.dbStore = getInitialSeedData();
+    }
     return globalForPrisma.dbStore;
   },
 
