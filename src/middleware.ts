@@ -9,11 +9,32 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-request-id', requestId);
 
+  // Handle CORS for native mobile app API requests
+  if (pathname.startsWith('/api/')) {
+    if (req.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id',
+          'Access-Control-Max-Age': '86400',
+        },
+      });
+    }
+  }
+
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,
     },
   });
+
+  if (pathname.startsWith('/api/')) {
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-request-id');
+  }
 
   // Attach Security Headers
   response.headers.set('X-Request-Id', requestId);

@@ -1,0 +1,71 @@
+{
+  "expo": {
+    "name": "VahanLoop",
+    "slug": "vahanloop",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "vahanloop",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#10243A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.vahanloop.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "VahanLoop uses your camera for vehicle inspection photographs and KYC identity verification.",
+        "NSPhotoLibraryUsageDescription": "VahanLoop requires photo library access to upload vehicle registration documents and photos.",
+        "NSLocationWhenInUseUsageDescription": "VahanLoop uses your location to discover nearby rental vehicles and depot pickup hubs."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#10243A"
+      },
+      "package": "com.vahanloop.app",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow VahanLoop to access your camera for vehicle inspection photography."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow VahanLoop to access your photo library to attach vehicle documentation."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow VahanLoop to access your location to show available vehicles near you."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "vahanloop-mobility-marketplace"
+      },
+      "apiBaseUrl": "https://vahanloop.vercel.app"
+    }
+  }
+}

@@ -100,15 +100,19 @@ export async function POST(req: NextRequest) {
       ownerProfileId: user.ownerProfile?.id,
     });
 
-    await db.auditLog.create({
-      data: {
-        actorId: user.id,
-        action: 'USER_REGISTERED',
-        entityType: 'USER',
-        entityId: user.id,
-        details: `Registered as ${requestedRole}`,
-      },
-    });
+    try {
+      await db.auditLog.create({
+        data: {
+          actorId: user.id,
+          action: 'USER_REGISTERED',
+          entityType: 'USER',
+          entityId: user.id,
+          details: `Registered as ${requestedRole}`,
+        },
+      });
+    } catch (auditErr) {
+      console.warn('Registration audit log warning:', auditErr);
+    }
 
     // Send welcome notification asynchronously
     sendNotification('ACCOUNT_WELCOME', {
@@ -121,6 +125,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(
       {
         message: 'Registration successful',
+        token: sessionToken,
         user: {
           id: user.id,
           fullName: user.fullName,

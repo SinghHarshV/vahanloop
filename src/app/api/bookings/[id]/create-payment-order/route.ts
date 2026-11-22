@@ -28,12 +28,13 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Access control: only customer who booked or admin
+    // Access control: customer who booked, admin, or any authenticated customer for demo bookings
     const isCustomer =
       booking.customerId === session.userId ||
       booking.customerId?.replace(/^user-/, 'usr-') === session.userId?.replace(/^user-/, 'usr-') ||
       booking.customer?.email === session.email ||
-      (booking.customerEmail && booking.customerEmail === session.email);
+      (booking.customerEmail && booking.customerEmail === session.email) ||
+      params.id.startsWith('bk-demo-');
 
     if (!isCustomer && !session.roles.includes('ADMIN')) {
       return NextResponse.json(
