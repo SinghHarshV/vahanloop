@@ -7,6 +7,8 @@ export const Colors = {
   emeraldDark: '#0E7553',
 
   // Background & Surfaces
+  white: '#FFFFFF',
+  black: '#000000',
   background: '#F7F8FA',
   card: '#FFFFFF',
   surface: '#FFFFFF',
